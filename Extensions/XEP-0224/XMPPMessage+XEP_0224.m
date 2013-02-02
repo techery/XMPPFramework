@@ -8,7 +8,8 @@
 
 - (BOOL)isAttentionMessage
 {
-	return  [self isHeadLineMessage] && [self elementForName:@"attention" xmlns:XMLNS_ATTENTION];
+	//return  [self isHeadLineMessage] && [self elementForName:@"attention" xmlns:XMLNS_ATTENTION];
+    return NO;
 }
 
 - (BOOL)isAttentionMessageWithBody

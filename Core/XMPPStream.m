@@ -187,6 +187,7 @@ enum XMPPStreamConfig
 @implementation XMPPStream
 
 @synthesize tag = userTag;
+@synthesize requireSecureAuthentication;
 
 /**
  * Shared initialization between the various init methods.
@@ -1724,7 +1725,7 @@ enum XMPPStreamConfig
 			someAuth = [[XMPPDigestMD5Authentication alloc] initWithStream:self password:password];
 			result = [self authenticate:someAuth error:&err];
 		}
-		else if ([self supportsPlainAuthentication])
+		else if ([self supportsPlainAuthentication] && requireSecureAuthentication?[self isSecure]:YES)
 		{
 			someAuth = [[XMPPPlainAuthentication alloc] initWithStream:self password:password];
 			result = [self authenticate:someAuth error:&err];
