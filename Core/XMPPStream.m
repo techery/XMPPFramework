@@ -1717,6 +1717,8 @@ enum XMPPStreamConfig
 		// Choose the best authentication method.
 		// 
 		// P.S. - This method is deprecated.
+        
+        BOOL allowPlainTextAuthentication = (requireSecureAuthentication && [self isSecure]) || !requireSecureAuthentication;       
 		
 		id <XMPPSASLAuthentication> someAuth = nil;
 		
@@ -1725,7 +1727,7 @@ enum XMPPStreamConfig
 			someAuth = [[XMPPDigestMD5Authentication alloc] initWithStream:self password:password];
 			result = [self authenticate:someAuth error:&err];
 		}
-		else if ([self supportsPlainAuthentication] && requireSecureAuthentication?[self isSecure]:YES)
+		else if ([self supportsPlainAuthentication] && allowPlainTextAuthentication)
 		{
 			someAuth = [[XMPPPlainAuthentication alloc] initWithStream:self password:password];
 			result = [self authenticate:someAuth error:&err];
