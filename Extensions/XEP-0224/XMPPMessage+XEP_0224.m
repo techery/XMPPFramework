@@ -1,4 +1,5 @@
 #import "XMPPMessage+XEP_0224.h"
+#import "NSXMLElement+XMPP.h"
 
 @implementation XMPPMessage (XEP_0224)
 
@@ -8,8 +9,7 @@
 
 - (BOOL)isAttentionMessage
 {
-	//return  [self isHeadLineMessage] && [self elementForName:@"attention" xmlns:XMLNS_ATTENTION];
-    return NO;
+	return  [self isHeadLineMessage] && [self elementForName:@"attention" xmlns:XMLNS_ATTENTION];
 }
 
 - (BOOL)isAttentionMessageWithBody
