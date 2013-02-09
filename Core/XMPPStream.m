@@ -1332,6 +1332,7 @@ enum XMPPStreamConfig
 	else
 		dispatch_sync(xmppQueue, block);
 	
+    //return YES;
 	return result;
 }
 
@@ -1717,6 +1718,8 @@ enum XMPPStreamConfig
 		// Choose the best authentication method.
 		// 
 		// P.S. - This method is deprecated.
+        
+        BOOL secure = [self isSecure];
         
         BOOL allowPlainTextAuthentication = (requireSecureAuthentication && [self isSecure]) || !requireSecureAuthentication;       
 		
@@ -2882,7 +2885,7 @@ enum XMPPStreamConfig
 	
 	if (f_starttls)
 	{
-		if ([f_starttls elementForName:@"required"])
+		if ([f_starttls elementForName:@"required"] || self.requireSecureAuthentication)
 		{
 			// TLS is required for this connection
 			
