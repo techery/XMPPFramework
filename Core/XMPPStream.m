@@ -187,7 +187,8 @@ enum XMPPStreamConfig
 @implementation XMPPStream
 
 @synthesize tag = userTag;
-@synthesize requireSecureAuthentication;
+@synthesize allowPlaintextAuthentication;
+@synthesize requireTLS;
 
 /**
  * Shared initialization between the various init methods.
@@ -1721,7 +1722,7 @@ enum XMPPStreamConfig
         
         BOOL secure = [self isSecure];
         
-        BOOL allowPlainTextAuthentication = (requireSecureAuthentication && [self isSecure]) || !requireSecureAuthentication;       
+        BOOL allowPlainText = (!allowPlaintextAuthentication && [self isSecure]) || allowPlaintextAuthentication;
 		
 		id <XMPPSASLAuthentication> someAuth = nil;
 		
@@ -1730,7 +1731,7 @@ enum XMPPStreamConfig
 			someAuth = [[XMPPDigestMD5Authentication alloc] initWithStream:self password:password];
 			result = [self authenticate:someAuth error:&err];
 		}
-		else if ([self supportsPlainAuthentication] && allowPlainTextAuthentication)
+		else if ([self supportsPlainAuthentication] && allowPlainText)
 		{
 			someAuth = [[XMPPPlainAuthentication alloc] initWithStream:self password:password];
 			result = [self authenticate:someAuth error:&err];
@@ -2885,7 +2886,7 @@ enum XMPPStreamConfig
 	
 	if (f_starttls)
 	{
-		if ([f_starttls elementForName:@"required"] || self.requireSecureAuthentication)
+		if ([f_starttls elementForName:@"required"] || requireTLS)
 		{
 			// TLS is required for this connection
 			
