@@ -293,14 +293,20 @@
 			
 			if (resource.intShow >= 3)
 				self.section = 0;
-			else
+			else if(resource.intShow == 2)
 				self.section = 1;
+            else if(resource.intShow == 1)
+                self.section = 2;
+            else if(resource.intShow == 0)
+                self.section = 3;
+            else
+                self.section = 2;
 		}
 	}
 	
 	if (self.primaryResource == nil)
 	{
-		self.section = 2;
+		self.section = 4;
 	}
 }
 
