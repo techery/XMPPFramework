@@ -1720,8 +1720,6 @@ enum XMPPStreamConfig
 		// 
 		// P.S. - This method is deprecated.
         
-        BOOL secure = [self isSecure];
-        
         BOOL allowPlainText = (!allowPlaintextAuthentication && [self isSecure]) || allowPlaintextAuthentication;
 		
 		id <XMPPSASLAuthentication> someAuth = nil;
