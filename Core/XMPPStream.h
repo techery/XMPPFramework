@@ -106,6 +106,15 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
 **/
 @property (readwrite, assign) UInt16 hostPort;
 
+
+/**
+ * Start TLS is used if the server supports it, regardless of wether it is required or not.
+ *
+ * The default is NO
+**/
+@property (readwrite, assign) BOOL autoStartTLS;
+
+
 /**
  * The JID of the user.
  * 
