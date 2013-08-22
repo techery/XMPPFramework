@@ -376,7 +376,7 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
  * In Band Registration.
  * Creating a user account on the xmpp server within the xmpp protocol.
  * 
- * The registerWithPassword:error: method is asynchronous.
+ * The registerWithElements:error: method is asynchronous.
  * It will return immediately, and the delegate methods are used to determine success.
  * See the xmppStreamDidRegister: and xmppStream:didNotRegister: methods.
  * 
@@ -385,10 +385,13 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
  * 
  * The errPtr parameter is optional - you may pass nil.
  * 
+ * registerWithPassword:error: is a convience method for creating an account using the given username and password.
+ *
  * Security Note:
  * The password will be sent in the clear unless the stream has been secured.
 **/
 - (BOOL)supportsInBandRegistration;
+- (BOOL)registerWithElements:(NSArray *)elements error:(NSError **)errPtr;
 - (BOOL)registerWithPassword:(NSString *)password error:(NSError **)errPtr;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -920,6 +923,13 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
 - (void)xmppStream:(XMPPStream *)sender didSendIQ:(XMPPIQ *)iq;
 - (void)xmppStream:(XMPPStream *)sender didSendMessage:(XMPPMessage *)message;
 - (void)xmppStream:(XMPPStream *)sender didSendPresence:(XMPPPresence *)presence;
+
+/**
+ * These methods are called after failing to send the respective XML elements over the stream.
+**/
+- (void)xmppStream:(XMPPStream *)sender didFailToSendIQ:(XMPPIQ *)iq error:(NSError *)error;
+- (void)xmppStream:(XMPPStream *)sender didFailToSendMessage:(XMPPMessage *)message error:(NSError *)error;
+- (void)xmppStream:(XMPPStream *)sender didFailToSendPresence:(XMPPPresence *)presence error:(NSError *)error;
 
 /**
  * This method is called if the disconnect method is called.

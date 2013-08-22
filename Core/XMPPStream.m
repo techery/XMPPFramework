@@ -87,7 +87,7 @@ enum XMPPStreamConfig
 	
 	dispatch_queue_t didReceiveIqQueue;
     
-    dispatch_source_t connectTimer;
+	dispatch_source_t connectTimer;
 	
 	GCDMulticastDelegate <XMPPStreamDelegate> *multicastDelegate;
 	
@@ -107,7 +107,7 @@ enum XMPPStreamConfig
 	NSString *hostName;
 	UInt16 hostPort;
     
-    BOOL autoStartTLS;
+	BOOL autoStartTLS;
 	
 	id <XMPPSASLAuthentication> auth;
 	NSDate *authenticationDate;
@@ -1593,14 +1593,14 @@ enum XMPPStreamConfig
 }
 
 /**
- * This method attempts to register a new user on the server using the given username and password.
+ * This method attempts to register a new user on the server using the given elements.
  * The result of this action will be returned via the delegate methods.
- * 
+ *
  * If the XMPPStream is not connected, or the server doesn't support in-band registration, this method does nothing.
 **/
-- (BOOL)registerWithPassword:(NSString *)password error:(NSError **)errPtr
+- (BOOL)registerWithElements:(NSArray *)elements error:(NSError **)errPtr
 {
-	XMPPLogTrace();
+    XMPPLogTrace();
 	
 	__block BOOL result = YES;
 	__block NSError *err = nil;
@@ -1618,17 +1618,6 @@ enum XMPPStreamConfig
 			return_from_block;
 		}
 		
-		if (myJID_setByClient == nil)
-		{
-			NSString *errMsg = @"You must set myJID before calling registerWithPassword:error:.";
-			NSDictionary *info = [NSDictionary dictionaryWithObject:errMsg forKey:NSLocalizedDescriptionKey];
-			
-			err = [NSError errorWithDomain:XMPPStreamErrorDomain code:XMPPStreamInvalidProperty userInfo:info];
-			
-			result = NO;
-			return_from_block;
-		}
-		
 		if (![self supportsInBandRegistration])
 		{
 			NSString *errMsg = @"The server does not support in band registration.";
@@ -1639,12 +1628,13 @@ enum XMPPStreamConfig
 			result = NO;
 			return_from_block;
 		}
-		
-		NSString *username = [myJID_setByClient user];
-		
+        
 		NSXMLElement *queryElement = [NSXMLElement elementWithName:@"query" xmlns:@"jabber:iq:register"];
-		[queryElement addChild:[NSXMLElement elementWithName:@"username" stringValue:username]];
-		[queryElement addChild:[NSXMLElement elementWithName:@"password" stringValue:password]];
+        
+        for(NSXMLElement *element in elements)
+        {
+            [queryElement addChild:element];
+        }
 		
 		NSXMLElement *iqElement = [NSXMLElement elementWithName:@"iq"];
 		[iqElement addAttributeWithName:@"type" stringValue:@"set"];
@@ -1663,6 +1653,54 @@ enum XMPPStreamConfig
 		// Update state
 		state = STATE_XMPP_REGISTERING;
 		
+	}};
+	
+	if (dispatch_get_specific(xmppQueueTag))
+		block();
+	else
+		dispatch_sync(xmppQueue, block);
+	
+	if (errPtr)
+		*errPtr = err;
+	
+	return result;
+    
+}
+
+/**
+ * This method attempts to register a new user on the server using the given username and password.
+ * The result of this action will be returned via the delegate methods.
+ * 
+ * If the XMPPStream is not connected, or the server doesn't support in-band registration, this method does nothing.
+**/
+- (BOOL)registerWithPassword:(NSString *)password error:(NSError **)errPtr
+{
+	XMPPLogTrace();
+	
+	__block BOOL result = YES;
+	__block NSError *err = nil;
+	
+	dispatch_block_t block = ^{ @autoreleasepool {
+		
+		if (myJID_setByClient == nil)
+		{
+			NSString *errMsg = @"You must set myJID before calling registerWithPassword:error:.";
+			NSDictionary *info = [NSDictionary dictionaryWithObject:errMsg forKey:NSLocalizedDescriptionKey];
+			
+			err = [NSError errorWithDomain:XMPPStreamErrorDomain code:XMPPStreamInvalidProperty userInfo:info];
+			
+			result = NO;
+			return_from_block;
+		}
+		
+		NSString *username = [myJID_setByClient user];
+		
+		NSMutableArray *elements = [NSMutableArray array];
+		[elements addObject:[NSXMLElement elementWithName:@"username" stringValue:username]];
+		[elements addObject:[NSXMLElement elementWithName:@"password" stringValue:password]];
+        
+        [self registerWithElements:elements error:errPtr];
+        
 	}};
 	
 	if (dispatch_get_specific(xmppQueueTag))
@@ -2463,6 +2501,14 @@ enum XMPPStreamConfig
 		{
 			[self sendElement:element withTag:TAG_XMPP_WRITE_STREAM];
 		}
+		else
+		{
+			NSError *error = [NSError errorWithDomain:XMPPStreamErrorDomain
+												 code:XMPPStreamInvalidState
+											 userInfo:nil];
+            
+			[self failToSendElement:element error:error];
+		}
 	}};
 	
 	if (dispatch_get_specific(xmppQueueTag))
@@ -2499,6 +2545,14 @@ enum XMPPStreamConfig
 				
 				[self sendElement:element withTag:TAG_XMPP_WRITE_RECEIPT];
 			}
+            else
+            {
+                NSError *error = [NSError errorWithDomain:XMPPStreamErrorDomain
+                                                     code:XMPPStreamInvalidState
+                                                 userInfo:nil];
+                
+                [self failToSendElement:element error:error];
+            }
 		}};
 		
 		if (dispatch_get_specific(xmppQueueTag))
@@ -2508,6 +2562,62 @@ enum XMPPStreamConfig
 		
 		*receiptPtr = receipt;
 	}
+}
+
+- (void)failToSendElement:(NSXMLElement *)element error:(NSError *)error
+{
+	NSAssert(dispatch_get_specific(xmppQueueTag), @"Invoked on incorrect queue");
+	
+	if ([element isKindOfClass:[XMPPIQ class]])
+	{
+		[self failToSendIQ:(XMPPIQ *)element error:error];
+	}
+	else if ([element isKindOfClass:[XMPPMessage class]])
+	{
+		[self failToSendMessage:(XMPPMessage *)element error:error];
+	}
+	else if ([element isKindOfClass:[XMPPPresence class]])
+	{
+		[self failToSendPresence:(XMPPPresence *)element error:error];
+	}
+	else
+	{
+		NSString *elementName = [element name];
+		
+		if ([elementName isEqualToString:@"iq"])
+		{
+			[self failToSendIQ:[XMPPIQ iqFromElement:element] error:error];
+		}
+		else if ([elementName isEqualToString:@"message"])
+		{
+			[self failToSendMessage:[XMPPMessage messageFromElement:element] error:error];
+		}
+		else if ([elementName isEqualToString:@"presence"])
+		{
+			[self failToSendPresence:[XMPPPresence presenceFromElement:element] error:error];
+		}
+	}
+}
+
+- (void)failToSendIQ:(XMPPIQ *)iq error:(NSError *)error
+{
+	NSAssert(dispatch_get_specific(xmppQueueTag), @"Invoked on incorrect queue");
+	
+	[multicastDelegate xmppStream:self didFailToSendIQ:iq error:error];
+}
+
+- (void)failToSendMessage:(XMPPMessage *)message error:(NSError *)error
+{
+	NSAssert(dispatch_get_specific(xmppQueueTag), @"Invoked on incorrect queue");
+	
+	[multicastDelegate xmppStream:self didFailToSendMessage:message error:error];
+}
+
+- (void)failToSendPresence:(XMPPPresence *)presence error:(NSError *)error
+{
+	NSAssert(dispatch_get_specific(xmppQueueTag), @"Invoked on incorrect queue");
+	
+	[multicastDelegate xmppStream:self didFailToSendPresence:presence error:error];
 }
 
 /**
@@ -3392,6 +3502,7 @@ enum XMPPStreamConfig
 			
 			NSXMLElement *iq = [NSXMLElement elementWithName:@"iq"];
 			[iq addAttributeWithName:@"type" stringValue:@"set"];
+            [iq addAttributeWithName:@"id" stringValue:[self generateUUID]];
 			[iq addChild:session];
 			
 			NSString *outgoingStr = [iq compactXMLString];
