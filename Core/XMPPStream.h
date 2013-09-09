@@ -71,8 +71,7 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Properties
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-@property (nonatomic) BOOL allowPlaintextAuthentication;
-@property (nonatomic) BOOL requireTLS;
+
 /**
  * The server's hostname that should be used to make the TCP connection.
  * This may be a domain name (e.g. "deusty.com") or an IP address (e.g. "70.85.193.226").
