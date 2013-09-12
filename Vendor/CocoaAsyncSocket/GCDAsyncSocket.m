@@ -32,7 +32,7 @@
 // For more information see: https://github.com/robbiehanson/CocoaAsyncSocket/wiki/ARC
 #endif
 
-#if 0
+#if 1
 
 // Logging Enabled - See log level below
 
@@ -6504,7 +6504,25 @@ static OSStatus SSLWriteFunction(SSLConnectionRef connection, const void *data, 
 	// Otherwise, the return value indicates an error code.
 	
 	OSStatus status = SSLHandshake(sslContext);
-	
+    
+    SSLProtocol protocol = nil;
+    SecTrustRef trust = nil;
+    SSLCipherSuite cipherSuite = nil;
+	OSStatus otherStatus = SSLCopyPeerTrust	(sslContext,&trust);
+    otherStatus = SSLGetNegotiatedCipher(sslContext,&cipherSuite);
+    
+    if (trust) {
+        CFIndex  index = SecTrustGetCertificateCount(trust);
+        if (index > 1) {
+            SecKeyRef publicKey =  SecTrustCopyPublicKey(trust);
+            SecCertificateRef certificate =  SecTrustGetCertificateAtIndex(trust,0);
+            CFStringRef certificateString =  SecCertificateCopySubjectSummary(certificate);
+            NSLog(@"CERT: %@",certificateString);
+        }
+    }
+    
+    
+    
 	if (status == noErr)
 	{
 		LogVerbose(@"SSLHandshake complete");
