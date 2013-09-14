@@ -75,6 +75,16 @@ static NSString *const XMPPGoogleTalkHostName = @"talk.google.com";
 
 - (BOOL)start:(NSError **)errPtr
 {
+    if (!accessToken)
+	{
+		NSString *errMsg = @"Missing facebook accessToken.";
+		NSDictionary *info = [NSDictionary dictionaryWithObject:errMsg forKey:NSLocalizedDescriptionKey];
+		
+		NSError *err = [NSError errorWithDomain:XMPPStreamErrorDomain code:XMPPStreamInvalidState userInfo:info];
+		
+		if (errPtr) *errPtr = err;
+		return NO;
+	}
 	XMPPLogTrace();
 	
 	// From RFC 4616 - PLAIN SASL Mechanism:
@@ -120,7 +130,7 @@ static NSString *const XMPPGoogleTalkHostName = @"talk.google.com";
 }
 @end
 
-@implementation XMPPStream (XMPPPlainAuthentication)
+@implementation XMPPStream (XMPPXOATH2Google)
 
 
 
@@ -138,7 +148,7 @@ static NSString *const XMPPGoogleTalkHostName = @"talk.google.com";
 	
 	dispatch_block_t block = ^{ @autoreleasepool {
 		
-		if ([self supportsXFacebookPlatformAuthentication])
+		if ([self supportsXOAUTH2GoogleAuthentication])
 		{
             XMPPXOATH2Google * googleAuth = [[XMPPXOATH2Google alloc] initWithStream:self
                                                                          accessToken:accessToken];
