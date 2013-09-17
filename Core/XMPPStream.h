@@ -25,6 +25,8 @@
   #define DEFAULT_KEEPALIVE_INTERVAL 300.0 //  5 Minutes
 #endif
 
+#define kXMPP_CERT_PINNING_KEY @"kXMPP_CERT_PINNING_KEY"
+
 extern NSString *const XMPPStreamErrorDomain;
 
 enum XMPPStreamErrorCode
@@ -112,6 +114,13 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
  * The default is NO
 **/
 @property (readwrite, assign) BOOL autoStartTLS;
+
+/**
+ * 
+ *
+ * The default is NO
+ **/
+@property (readwrite, assign) BOOL manuallyEvaluateTrust;
 
 
 /**
@@ -791,6 +800,11 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
  * where the development server may be using a self-signed certificate.
 **/
 - (void)xmppStream:(XMPPStream *)sender willSecureWithSettings:(NSMutableDictionary *)settings;
+
+/**
+ * 
+ **/
+- (BOOL)socket:(GCDAsyncSocket *)sock shouldTrustPeer:(SecTrustRef)trust;
 
 /**
  * This method is called after the stream has been secured via SSL/TLS.

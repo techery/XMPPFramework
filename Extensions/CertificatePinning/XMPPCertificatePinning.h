@@ -8,6 +8,18 @@
 
 #import "XMPPModule.h"
 
+@class AFSecurityPolicy;
+
 @interface XMPPCertificatePinning : XMPPModule
+{
+    AFSecurityPolicy * securityPolicy;
+}
+
+@property (nonatomic,strong) NSArray * pinnedCertificates;
+
+- (id)initWithCertificates:(NSArray *)certificates;
+- (id)initWithDefaultCertificates;
+
++ (id)defaultCertificates;
 
 @end

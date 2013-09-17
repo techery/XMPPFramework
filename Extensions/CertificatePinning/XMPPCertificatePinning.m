@@ -7,7 +7,60 @@
 //
 
 #import "XMPPCertificatePinning.h"
+#import "XMPPStream.h"
+#import "AFSecurityPolicy.h"
 
 @implementation XMPPCertificatePinning
+
+
+- (id)initWithCertificates:(NSArray *)certificates
+{
+    if (self = [super init]) {
+        securityPolicy = [[AFSecurityPolicy alloc] init];
+        securityPolicy.pinnedCertificates = certificates;
+        securityPolicy.SSLPinningMode= AFSSLPinningModePublicKey;
+    }
+    return self;
+}
+- (id)initWithDefaultCertificates
+{
+    if (self = [super init]) {
+        securityPolicy = [AFSecurityPolicy defaultPolicy];
+    }
+    return self;
+    
+}
+
++ (id)defaultCertificates
+{
+    XMPPCertificatePinning * certPinning = [[XMPPCertificatePinning alloc] initWithDefaultCertificates];
+    return certPinning;
+}
+/**
+ *For simulator use and collecting certs in documents folder then moved to App Bundle
+ **/
+-(void)writeCertToDisk:(SecTrustRef)trust withFileName:(NSString *)fileName
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
+    NSString * path = [NSString pathWithComponents:@[basePath,fileName]];
+    
+    CFIndex certificateCount = SecTrustGetCertificateCount(trust);
+    if (certificateCount) {
+        SecCertificateRef certificate = SecTrustGetCertificateAtIndex(trust, 0);
+        NSData * data = (__bridge_transfer NSData *)SecCertificateCopyData(certificate);
+        [data writeToFile:path atomically:YES];
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma mark XMPPStreamDeleage
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+- (BOOL)socket:(GCDAsyncSocket *)sock shouldTrustPeer:(SecTrustRef)trust
+{
+    //[self writeCertToDisk:trust withFileName:@"google.cer"];
+    BOOL trusted = [securityPolicy evaluateServerTrust:trust];
+    return trusted;
+}
 
 @end
