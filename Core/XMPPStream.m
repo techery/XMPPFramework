@@ -3857,25 +3857,6 @@ enum XMPPStreamConfig
 - (void)socketDidSecure:(GCDAsyncSocket *)socket
 {
 	// This method is invoked on the xmppQueue.
-    [socket performBlock:^{
-        
-        CFReadStreamRef readStream = [socket readStream];
-        CFArrayRef certs = CFReadStreamCopyProperty(readStream, kCFStreamSSLCertificates);
-        NSArray *array = (__bridge NSArray*)certs;
-        if (certs && (CFArrayGetCount(certs) > 0))
-        {
-            // The first cert in the chain is the subject cert
-            SecCertificateRef cert = (SecCertificateRef)CFArrayGetValueAtIndex(certs, 0);
-            
-            //NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-            
-            //result = [[self extractCertDictFromCert:cert] retain];
-            
-            //[pool release];
-        }
-    }];
-    
-	
 	XMPPLogTrace();
 	
 	[multicastDelegate xmppStreamDidSecure:self];
