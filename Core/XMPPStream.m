@@ -93,7 +93,7 @@ enum XMPPStreamConfig
 	
 	int state;
 	
-	GCDAsyncSocket *asyncSocket;
+	GCDAsyncProxySocket *asyncSocket;
 	
 	UInt64 numberOfBytesSent;
 	UInt64 numberOfBytesReceived;
@@ -225,7 +225,7 @@ enum XMPPStreamConfig
 		[self commonInit];
 		
 		// Initialize socket
-		asyncSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:xmppQueue];
+		asyncSocket = [[GCDAsyncProxySocket alloc] initWithDelegate:self delegateQueue:xmppQueue];
 	}
 	return self;
 }
@@ -846,6 +846,15 @@ enum XMPPStreamConfig
 		flags &= ~kDidStartNegotiation;
 }
 
+- (void) setProxyHost:(NSString*)host port:(uint16_t)port version:(GCDAsyncSocketSOCKSVersion)version {
+    [asyncSocket setProxyHost:host port:port version:version];
+}
+
+- (void) setProxyUsername:(NSString *)username password:(NSString*)password {
+    [asyncSocket setProxyUsername:username password:password];
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Connection State
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1222,7 +1231,7 @@ enum XMPPStreamConfig
 		state = STATE_XMPP_CONNECTING;
 		
 		// Initailize socket
-		asyncSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:xmppQueue];
+		asyncSocket = [[GCDAsyncProxySocket alloc] initWithDelegate:self delegateQueue:xmppQueue];
 		
 		NSError *connectErr = nil;
 		result = [asyncSocket connectToAddress:remoteAddr error:&connectErr];
@@ -1310,7 +1319,7 @@ enum XMPPStreamConfig
 		NSAssert((asyncSocket == nil), @"Forgot to release the previous asyncSocket instance.");
 		
 		// Store and configure socket
-		asyncSocket = acceptedSocket;
+		asyncSocket = (GCDAsyncProxySocket*)acceptedSocket;
 		[asyncSocket setDelegate:self delegateQueue:xmppQueue];
 		
 		// Notify delegates

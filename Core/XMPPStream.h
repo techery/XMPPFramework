@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 #import "XMPPSASLAuthentication.h"
-#import "GCDAsyncSocket.h"
+#import "GCDAsyncProxySocket.h"
 #import "GCDMulticastDelegate.h"
 
 #if TARGET_OS_IPHONE
@@ -328,6 +328,12 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
  * Attempting to send elements after this method has been called will not work (the elements won't get sent).
 **/
 - (void)disconnectAfterSending;
+
+/**
+ * Sets SOCKS proxy host and port
+**/
+- (void) setProxyHost:(NSString*)host port:(uint16_t)port version:(GCDAsyncSocketSOCKSVersion)version;
+- (void) setProxyUsername:(NSString *)username password:(NSString*)password; // TODO
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Security
