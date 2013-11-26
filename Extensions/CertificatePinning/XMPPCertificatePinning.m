@@ -25,7 +25,7 @@
 - (id)initWithDefaultCertificates
 {
     if (self = [super init]) {
-        securityPolicy = [AFSecurityPolicy defaultPolicy];
+        securityPolicy = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModeCertificate];
     }
     return self;
     
