@@ -12,13 +12,14 @@
 
 @implementation XMPPCertificatePinning
 
+@synthesize securityPolicy;
 
 - (id)initWithCertificates:(NSArray *)certificates
 {
     if (self = [super init]) {
-        securityPolicy = [[AFSecurityPolicy alloc] init];
-        securityPolicy.pinnedCertificates = certificates;
-        securityPolicy.SSLPinningMode= AFSSLPinningModePublicKey;
+        self.securityPolicy = [[AFSecurityPolicy alloc] init];
+        self.securityPolicy.pinnedCertificates = certificates;
+        self.securityPolicy.SSLPinningMode= AFSSLPinningModePublicKey;
     }
     return self;
 }
@@ -33,7 +34,7 @@
 
 + (id)defaultCertificates
 {
-    XMPPCertificatePinning * certPinning = [[XMPPCertificatePinning alloc] initWithDefaultCertificates];
+    XMPPCertificatePinning * certPinning = [[self alloc] initWithDefaultCertificates];
     return certPinning;
 }
 /**
@@ -62,5 +63,8 @@
     BOOL trusted = [securityPolicy evaluateServerTrust:trust];
     return trusted;
 }
+
+
+
 
 @end

@@ -1573,13 +1573,11 @@ enum XMPPStreamConfig
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark CertificatePinning
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-- (BOOL)socketShouldManuallyEvaluateTrust:(GCDAsyncSocket *)sock
-{
+- (BOOL)socketShouldManuallyEvaluateTrust:(GCDAsyncSocket *)sock {
     return [self manuallyEvaluateTrust];
 }
 
-- (BOOL)socket:(GCDAsyncSocket *)sock shouldTrustPeer:(SecTrustRef)trust
-{
+- (BOOL)socket:(GCDAsyncSocket *)sock shouldTrustPeer:(SecTrustRef)trust {
     __block BOOL result = NO;
     GCDMulticastDelegateEnumerator *delegateEnumerator = [multicastDelegate delegateEnumerator];
     id delegate;
@@ -1594,6 +1592,22 @@ enum XMPPStreamConfig
                 result = YES;
             }
             
+        }});
+    }
+    return result;
+}
+
+- (BOOL)socket:(GCDAsyncSocket *)sock shouldFinishConnectionWithTrust:(SecTrustRef)trust status:(OSStatus)status {
+    __block BOOL result = YES;
+    GCDMulticastDelegateEnumerator *delegateEnumerator = [multicastDelegate delegateEnumerator];
+    id delegate;
+    dispatch_queue_t delegateQueue;
+    SEL selector = @selector(socket:shouldFinishConnectionWithTrust:status:);
+    while ([delegateEnumerator getNextDelegate:&delegate delegateQueue:&delegateQueue forSelector:selector])
+    {
+        dispatch_sync(delegateQueue, ^{ @autoreleasepool {
+            
+            result = [delegate socket:sock shouldFinishConnectionWithTrust:trust status:status];
         }});
     }
     return result;

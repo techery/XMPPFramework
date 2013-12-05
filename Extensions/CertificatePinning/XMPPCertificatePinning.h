@@ -11,11 +11,8 @@
 @class AFSecurityPolicy;
 
 @interface XMPPCertificatePinning : XMPPModule
-{
-    AFSecurityPolicy * securityPolicy;
-}
 
-@property (nonatomic,strong) NSArray * pinnedCertificates;
+@property (nonatomic,strong) AFSecurityPolicy * securityPolicy;
 
 - (id)initWithCertificates:(NSArray *)certificates;
 - (id)initWithDefaultCertificates;
