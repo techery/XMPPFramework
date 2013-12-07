@@ -108,7 +108,6 @@ enum XMPPStreamConfig
 	UInt16 hostPort;
     
 	BOOL autoStartTLS;
-    BOOL manuallyEvaluateTrust;
 	
 	id <XMPPSASLAuthentication> auth;
 	NSDate *authenticationDate;
@@ -397,33 +396,6 @@ enum XMPPStreamConfig
 {
 	dispatch_block_t block = ^{
 		autoStartTLS = flag;
-	};
-	
-	if (dispatch_get_specific(xmppQueueTag))
-		block();
-	else
-		dispatch_async(xmppQueue, block);
-}
-
-- (BOOL)manuallyEvaluateTrust
-{
-    __block BOOL result;
-    
-    dispatch_block_t block = ^{
-        result = manuallyEvaluateTrust;
-    };
-    
-    if (dispatch_get_specific(xmppQueueTag))
-        block();
-    else
-        dispatch_sync(xmppQueue, block);
-    
-    return result;
-}
-- (void)setManuallyEvaluateTrust:(BOOL)flag
-{
-    dispatch_block_t block = ^{
-		manuallyEvaluateTrust = flag;
 	};
 	
 	if (dispatch_get_specific(xmppQueueTag))
@@ -1002,7 +974,9 @@ enum XMPPStreamConfig
 	NSAssert(dispatch_get_specific(xmppQueueTag), @"Invoked on incorrect queue");
 	
 	XMPPLogTrace();
-	
+    
+    _connectedHostName = [host copy];
+    
 	BOOL result = [asyncSocket connectToHost:host onPort:port error:errPtr];
 	
 	if (result && [self resetByteCountPerConnection])
@@ -1574,7 +1548,23 @@ enum XMPPStreamConfig
 #pragma mark CertificatePinning
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 - (BOOL)socketShouldManuallyEvaluateTrust:(GCDAsyncSocket *)sock {
-    return [self manuallyEvaluateTrust];
+    __block BOOL result = NO;
+    GCDMulticastDelegateEnumerator *delegateEnumerator = [multicastDelegate delegateEnumerator];
+    id delegate;
+    dispatch_queue_t delegateQueue;
+    SEL selector = @selector(socketShouldManuallyEvaluateTrust:);
+    while ([delegateEnumerator getNextDelegate:&delegate delegateQueue:&delegateQueue forSelector:selector])
+    {
+        dispatch_sync(delegateQueue, ^{ @autoreleasepool {
+            
+            if([delegate socketShouldManuallyEvaluateTrust:sock])
+            {
+                result = YES;
+            }
+            
+        }});
+    }
+    return result;
 }
 
 - (BOOL)socket:(GCDAsyncSocket *)sock shouldTrustPeer:(SecTrustRef)trust {
@@ -3742,6 +3732,7 @@ enum XMPPStreamConfig
 		
 		if (success)
 		{
+        
 			break;
 		}
 		else
@@ -3929,6 +3920,8 @@ enum XMPPStreamConfig
 - (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err
 {
 	// This method is invoked on the xmppQueue.
+    
+    _connectedHostName = nil;
 	
 	XMPPLogTrace();
     
