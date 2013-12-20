@@ -44,13 +44,14 @@
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
-    NSString * path = [NSString pathWithComponents:@[basePath,fileName]];
-    
-    CFIndex certificateCount = SecTrustGetCertificateCount(trust);
-    if (certificateCount) {
-        SecCertificateRef certificate = SecTrustGetCertificateAtIndex(trust, 0);
-        NSData * data = (__bridge_transfer NSData *)SecCertificateCopyData(certificate);
-        [data writeToFile:path atomically:YES];
+    if (basePath) {
+        NSString * path = [NSString pathWithComponents:@[basePath,fileName]];
+        CFIndex certificateCount = SecTrustGetCertificateCount(trust);
+        if (certificateCount) {
+            SecCertificateRef certificate = SecTrustGetCertificateAtIndex(trust, 0);
+            NSData * data = (__bridge_transfer NSData *)SecCertificateCopyData(certificate);
+            [data writeToFile:path atomically:YES];
+        }
     }
 }
 
