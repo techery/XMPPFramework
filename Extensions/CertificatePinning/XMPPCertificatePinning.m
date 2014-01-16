@@ -12,20 +12,21 @@
 
 @implementation XMPPCertificatePinning
 
+@synthesize securityPolicy;
 
 - (id)initWithCertificates:(NSArray *)certificates
 {
     if (self = [super init]) {
-        securityPolicy = [[AFSecurityPolicy alloc] init];
-        securityPolicy.pinnedCertificates = certificates;
-        securityPolicy.SSLPinningMode= AFSSLPinningModePublicKey;
+        self.securityPolicy = [[AFSecurityPolicy alloc] init];
+        self.securityPolicy.pinnedCertificates = certificates;
+        self.securityPolicy.SSLPinningMode= AFSSLPinningModePublicKey;
     }
     return self;
 }
 - (id)initWithDefaultCertificates
 {
     if (self = [super init]) {
-        securityPolicy = [AFSecurityPolicy defaultPolicy];
+        securityPolicy = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModeCertificate];
     }
     return self;
     
@@ -33,7 +34,7 @@
 
 + (id)defaultCertificates
 {
-    XMPPCertificatePinning * certPinning = [[XMPPCertificatePinning alloc] initWithDefaultCertificates];
+    XMPPCertificatePinning * certPinning = [[self alloc] initWithDefaultCertificates];
     return certPinning;
 }
 /**
@@ -43,13 +44,14 @@
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
-    NSString * path = [NSString pathWithComponents:@[basePath,fileName]];
-    
-    CFIndex certificateCount = SecTrustGetCertificateCount(trust);
-    if (certificateCount) {
-        SecCertificateRef certificate = SecTrustGetCertificateAtIndex(trust, 0);
-        NSData * data = (__bridge_transfer NSData *)SecCertificateCopyData(certificate);
-        [data writeToFile:path atomically:YES];
+    if (basePath) {
+        NSString * path = [NSString pathWithComponents:@[basePath,fileName]];
+        CFIndex certificateCount = SecTrustGetCertificateCount(trust);
+        if (certificateCount) {
+            SecCertificateRef certificate = SecTrustGetCertificateAtIndex(trust, 0);
+            NSData * data = (__bridge_transfer NSData *)SecCertificateCopyData(certificate);
+            [data writeToFile:path atomically:YES];
+        }
     }
 }
 
@@ -62,5 +64,8 @@
     BOOL trusted = [securityPolicy evaluateServerTrust:trust];
     return trusted;
 }
+
+
+
 
 @end

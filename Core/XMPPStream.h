@@ -116,11 +116,9 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
 @property (readwrite, assign) BOOL autoStartTLS;
 
 /**
- * 
- *
- * The default is NO
- **/
-@property (readwrite, assign) BOOL manuallyEvaluateTrust;
+ * The connected servers hostname. The last attempted hostname before the socket actually connects to an IP address
+**/
+@property (nonatomic,readonly) NSString *connectedHostName;
 
 
 /**
