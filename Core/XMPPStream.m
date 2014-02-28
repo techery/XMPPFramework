@@ -94,7 +94,7 @@ enum XMPPStreamConfig
 	
 	int state;
 	
-	GCDAsyncProxySocket *asyncSocket;
+	GCDAsyncSocket *asyncSocket;
 	
 	UInt64 numberOfBytesSent;
 	UInt64 numberOfBytesReceived;
@@ -229,7 +229,7 @@ enum XMPPStreamConfig
 		[self commonInit];
 		
 		// Initialize socket
-		asyncSocket = [[GCDAsyncProxySocket alloc] initWithDelegate:self delegateQueue:xmppQueue];
+		asyncSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:xmppQueue];
 	}
 	return self;
 }
@@ -826,11 +826,13 @@ enum XMPPStreamConfig
 }
 
 - (void) setProxyHost:(NSString*)host port:(uint16_t)port version:(GCDAsyncSocketSOCKSVersion)version {
-    [asyncSocket setProxyHost:host port:port version:version];
+    asyncSocket = [[GCDAsyncProxySocket alloc] initWithDelegate:self delegateQueue:xmppQueue];
+    [(GCDAsyncProxySocket *)asyncSocket setProxyHost:host port:port version:version];
 }
 
 - (void) setProxyUsername:(NSString *)username password:(NSString*)password {
-    [asyncSocket setProxyUsername:username password:password];
+    asyncSocket = [[GCDAsyncProxySocket alloc] initWithDelegate:self delegateQueue:xmppQueue];
+    [(GCDAsyncProxySocket *)asyncSocket setProxyUsername:username password:password];
 }
 
 
@@ -1212,7 +1214,8 @@ enum XMPPStreamConfig
 		state = STATE_XMPP_CONNECTING;
 		
 		// Initailize socket
-		asyncSocket = [[GCDAsyncProxySocket alloc] initWithDelegate:self delegateQueue:xmppQueue];
+		asyncSocket = [[GCDAsyncSocket alloc] initWithDelegate:self
+                                                 delegateQueue:xmppQueue];
 		
 		NSError *connectErr = nil;
 		result = [asyncSocket connectToAddress:remoteAddr error:&connectErr];
