@@ -14,6 +14,7 @@
 @class XMPPMessage;
 @class XMPPPresence;
 @class XMPPModule;
+@class XMPPElement;
 @class XMPPElementReceipt;
 @protocol XMPPStreamDelegate;
 
@@ -116,11 +117,9 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
 @property (readwrite, assign) BOOL autoStartTLS;
 
 /**
- * 
- *
- * The default is NO
- **/
-@property (readwrite, assign) BOOL manuallyEvaluateTrust;
+ * The connected servers hostname. The last attempted hostname before the socket actually connects to an IP address
+**/
+@property (nonatomic,readonly) NSString *connectedHostName;
 
 
 /**
@@ -603,6 +602,18 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
  * Using this method guarantees everything is done as an atomic operation.
 **/
 - (void)resendMyPresence;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma mark Stanza Validation
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Validates that a response element is FROM the jid that the request element was sent TO.
+ * Supports validating responses when request didn't specify a TO.
+**/
+- (BOOL)isValidResponseElementFrom:(XMPPJID *)from forRequestElementTo:(XMPPJID *)to;
+
+- (BOOL)isValidResponseElement:(XMPPElement *)response forRequestElement:(XMPPElement *)request;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Module Plug-In System

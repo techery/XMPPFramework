@@ -389,7 +389,17 @@
 
 - (NSArray *)allResources
 {
-	return [[self resources] allObjects];
+    NSMutableArray *allResources = [NSMutableArray array];
+	
+    for (XMPPResourceCoreDataStorageObject *resource in [[self resources] allObjects]) {
+        
+        if(![resource isDeleted])
+        {
+            [allResources addObject:resource];
+        }
+    }
+    
+    return allResources;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

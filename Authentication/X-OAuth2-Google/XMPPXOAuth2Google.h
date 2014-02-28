@@ -1,8 +1,8 @@
 //
-//  XMPPXOATH2Google.h
+//  XMPPXOAuth2Google.h
 //  Off the Record
 //
-//  Created by David on 9/13/13.
+//  Created by David Chiles on 9/13/13.
 //  Copyright (c) 2013 Chris Ballinger. All rights reserved.
 //
 
@@ -10,7 +10,7 @@
 #import "XMPPSASLAuthentication.h"
 #import "XMPPStream.h"
 
-@interface XMPPXOATH2Google : NSObject <XMPPSASLAuthentication>
+@interface XMPPXOAuth2Google : NSObject <XMPPSASLAuthentication>
 
 -(id)initWithStream:(XMPPStream *)stream accessToken:(NSString *)accessToken;
 
@@ -18,10 +18,10 @@
 
 
 
-@interface XMPPStream (XMPPXOATH2Google)
+@interface XMPPStream (XMPPXOAuth2Google)
 
 
-- (BOOL)supportsXOAUTH2GoogleAuthentication;
+- (BOOL)supportsXOAuth2GoogleAuthentication;
 
 - (BOOL)authenticateWithGoogleAccessToken:(NSString *)accessToken error:(NSError **)errPtr;
 

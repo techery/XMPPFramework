@@ -1,12 +1,12 @@
 //
-//  XMPPXOATH2Google.m
+//  XMPPXOAuth2Google.m
 //  Off the Record
 //
-//  Created by David on 9/13/13.
+//  Created by David Chiles on 9/13/13.
 //  Copyright (c) 2013 Chris Ballinger. All rights reserved.
 //
 
-#import "XMPPXOATH2Google.h"
+#import "XMPPXOAuth2Google.h"
 #import "XMPP.h"
 #import "XMPPLogging.h"
 #import "XMPPInternal.h"
@@ -27,7 +27,7 @@ static const int xmppLogLevel = XMPP_LOG_LEVEL_WARN;
 
 static NSString *const XMPPGoogleTalkHostName = @"talk.google.com";
 
-@interface XMPPXOATH2Google ()
+@interface XMPPXOAuth2Google ()
 {
 #if __has_feature(objc_arc_weak)
 	__weak XMPPStream *xmppStream;
@@ -47,7 +47,7 @@ static NSString *const XMPPGoogleTalkHostName = @"talk.google.com";
 
 @end
 
-@implementation XMPPXOATH2Google
+@implementation XMPPXOAuth2Google
 
 + (NSString *)mechanismName
 {
@@ -130,13 +130,13 @@ static NSString *const XMPPGoogleTalkHostName = @"talk.google.com";
 }
 @end
 
-@implementation XMPPStream (XMPPXOATH2Google)
+@implementation XMPPStream (XMPPXOAuth2Google)
 
 
 
-- (BOOL)supportsXOAUTH2GoogleAuthentication
+- (BOOL)supportsXOAuth2GoogleAuthentication
 {
-	return [self supportsAuthenticationMechanism:[XMPPXOATH2Google mechanismName]];
+	return [self supportsAuthenticationMechanism:[XMPPXOAuth2Google mechanismName]];
 }
 
 - (BOOL)authenticateWithGoogleAccessToken:(NSString *)accessToken error:(NSError **)errPtr
@@ -148,9 +148,9 @@ static NSString *const XMPPGoogleTalkHostName = @"talk.google.com";
 	
 	dispatch_block_t block = ^{ @autoreleasepool {
 		
-		if ([self supportsXOAUTH2GoogleAuthentication])
+		if ([self supportsXOAuth2GoogleAuthentication])
 		{
-            XMPPXOATH2Google * googleAuth = [[XMPPXOATH2Google alloc] initWithStream:self
+            XMPPXOAuth2Google * googleAuth = [[XMPPXOAuth2Google alloc] initWithStream:self
                                                                          accessToken:accessToken];
 			
 			result = [self authenticate:googleAuth error:&err];
