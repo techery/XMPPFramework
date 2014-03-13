@@ -117,10 +117,16 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
 @property (readwrite, assign) BOOL autoStartTLS;
 
 /**
+ * Require TLS when connecting and aborts connection when STARTTLS is not found during negotiation.
+ *
+ * The default is NO
+ **/
+@property (readwrite, assign) BOOL requireTLS;
+
+/**
  * The connected servers hostname. The last attempted hostname before the socket actually connects to an IP address
 **/
 @property (nonatomic,readonly) NSString *connectedHostName;
-
 
 /**
  * The JID of the user.
