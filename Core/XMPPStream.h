@@ -117,10 +117,16 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
 @property (readwrite, assign) BOOL autoStartTLS;
 
 /**
+ * Require TLS when connecting and aborts connection when STARTTLS is not found during negotiation.
+ *
+ * The default is NO
+ **/
+@property (readwrite, assign) BOOL requireTLS;
+
+/**
  * The connected servers hostname. The last attempted hostname before the socket actually connects to an IP address
 **/
 @property (nonatomic,readonly) NSString *connectedHostName;
-
 
 /**
  * The JID of the user.
@@ -230,6 +236,22 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
  * Tag values are not used internally, and should not be used by xmpp modules.
 **/
 @property (readwrite, strong) id tag;
+
+/**
+ * RFC 6121 states that starting a session is no longer required.
+ * To skip this step set skipStartSession to YES.
+ *
+ * [RFC3921] specified one additional
+ * precondition: formal establishment of an instant messaging and
+ * presence session.  Implementation and deployment experience has
+ * shown that this additional step is unnecessary.  However, for
+ * backward compatibility an implementation MAY still offer that
+ * feature.  This enables older software to connect while letting
+ * newer software save a round trip.
+ *
+ * The default value is NO.
+**/
+@property (readwrite, assign) BOOL skipStartSession;
 
 #if TARGET_OS_IPHONE
 

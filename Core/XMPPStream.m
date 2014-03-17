@@ -109,6 +109,8 @@ enum XMPPStreamConfig
 	UInt16 hostPort;
     
 	BOOL autoStartTLS;
+    BOOL requireTLS;
+    BOOL skipStartSession;
 	
 	id <XMPPSASLAuthentication> auth;
 	NSDate *authenticationDate;
@@ -204,6 +206,9 @@ enum XMPPStreamConfig
 	
 	numberOfBytesSent = 0;
 	numberOfBytesReceived = 0;
+    
+    autoStartTLS = NO;
+    requireTLS = NO;
 	
 	hostPort = 5222;
 	keepAliveInterval = DEFAULT_KEEPALIVE_INTERVAL;
@@ -403,6 +408,34 @@ enum XMPPStreamConfig
 {
 	dispatch_block_t block = ^{
 		autoStartTLS = flag;
+	};
+	
+	if (dispatch_get_specific(xmppQueueTag))
+		block();
+	else
+		dispatch_async(xmppQueue, block);
+}
+
+- (BOOL)requireTLS
+{
+    __block BOOL result;
+    
+    dispatch_block_t block = ^{
+        result = requireTLS;
+    };
+    
+    if (dispatch_get_specific(xmppQueueTag))
+        block();
+    else
+        dispatch_sync(xmppQueue, block);
+    
+    return result;
+}
+
+- (void)setRequireTLS:(BOOL)flag
+{
+	dispatch_block_t block = ^{
+		requireTLS = flag;
 	};
 	
 	if (dispatch_get_specific(xmppQueueTag))
@@ -667,6 +700,34 @@ enum XMPPStreamConfig
 		block();
 	else
 		dispatch_async(xmppQueue, block);
+}
+
+- (BOOL)skipStartSession
+{
+    __block BOOL result = NO;
+    
+    dispatch_block_t block = ^{
+        result = skipStartSession;
+    };
+    
+    if (dispatch_get_specific(xmppQueueTag))
+        block();
+    else
+        dispatch_sync(xmppQueue, block);
+    
+    return result;
+}
+
+- (void)setSkipStartSession:(BOOL)flag
+{
+    dispatch_block_t block = ^{
+        skipStartSession = flag;
+    };
+    
+    if (dispatch_get_specific(xmppQueueTag))
+        block();
+    else
+        dispatch_async(xmppQueue, block);
 }
 
 #if TARGET_OS_IPHONE
@@ -3329,7 +3390,11 @@ enum XMPPStreamConfig
 			// We're already listening for the response...
 			return;
 		}
-	}
+	} else if ([self requireTLS] && ![self isSecure]) {
+        // Instead of allowing an insecure connection when STARTTLS
+        // is desired but not found, shut it all down instead.
+        [self disconnect];
+    }
 	
 	// Check to see if resource binding is required
 	// Don't forget about that NSXMLElement bug you reported to apple (xmlns is required or element won't be found)
@@ -3560,7 +3625,7 @@ enum XMPPStreamConfig
 		// Don't forget about that NSXMLElement bug you reported to apple (xmlns is required or element won't be found)
 		NSXMLElement *f_session = [features elementForName:@"session" xmlns:@"urn:ietf:params:xml:ns:xmpp-session"];
 		
-		if (f_session)
+		if (f_session && (![self skipStartSession]))
 		{
 			NSXMLElement *session = [NSXMLElement elementWithName:@"session"];
 			[session setXmlns:@"urn:ietf:params:xml:ns:xmpp-session"];
