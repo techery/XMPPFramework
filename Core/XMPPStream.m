@@ -205,9 +205,6 @@ enum XMPPStreamConfig
 	
 	numberOfBytesSent = 0;
 	numberOfBytesReceived = 0;
-    
-    autoStartTLS = NO;
-    requireTLS = NO;
 	
 	hostPort = 5222;
 	keepAliveInterval = DEFAULT_KEEPALIVE_INTERVAL;
@@ -406,34 +403,6 @@ enum XMPPStreamConfig
 {
 	dispatch_block_t block = ^{
 		startTLSPolicy = flag;
-	};
-	
-	if (dispatch_get_specific(xmppQueueTag))
-		block();
-	else
-		dispatch_async(xmppQueue, block);
-}
-
-- (BOOL)requireTLS
-{
-    __block BOOL result;
-    
-    dispatch_block_t block = ^{
-        result = requireTLS;
-    };
-    
-    if (dispatch_get_specific(xmppQueueTag))
-        block();
-    else
-        dispatch_sync(xmppQueue, block);
-    
-    return result;
-}
-
-- (void)setRequireTLS:(BOOL)flag
-{
-	dispatch_block_t block = ^{
-		requireTLS = flag;
 	};
 	
 	if (dispatch_get_specific(xmppQueueTag))
