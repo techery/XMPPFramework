@@ -1620,64 +1620,6 @@ enum XMPPStreamConfig
 	
 	return result;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma mark CertificatePinning
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-- (BOOL)socketShouldManuallyEvaluateTrust:(GCDAsyncSocket *)sock {
-    __block BOOL result = NO;
-    GCDMulticastDelegateEnumerator *delegateEnumerator = [multicastDelegate delegateEnumerator];
-    id delegate;
-    dispatch_queue_t delegateQueue;
-    SEL selector = @selector(socketShouldManuallyEvaluateTrust:);
-    while ([delegateEnumerator getNextDelegate:&delegate delegateQueue:&delegateQueue forSelector:selector])
-    {
-        dispatch_sync(delegateQueue, ^{ @autoreleasepool {
-            
-            if([delegate socketShouldManuallyEvaluateTrust:sock])
-            {
-                result = YES;
-            }
-            
-        }});
-    }
-    return result;
-}
-
-- (BOOL)socket:(GCDAsyncSocket *)sock shouldTrustPeer:(SecTrustRef)trust {
-    __block BOOL result = NO;
-    GCDMulticastDelegateEnumerator *delegateEnumerator = [multicastDelegate delegateEnumerator];
-    id delegate;
-    dispatch_queue_t delegateQueue;
-    SEL selector = @selector(socket:shouldTrustPeer:);
-    while ([delegateEnumerator getNextDelegate:&delegate delegateQueue:&delegateQueue forSelector:selector])
-    {
-        dispatch_sync(delegateQueue, ^{ @autoreleasepool {
-            
-            if([delegate socket:sock shouldTrustPeer:trust])
-            {
-                result = YES;
-            }
-            
-        }});
-    }
-    return result;
-}
-
-- (BOOL)socket:(GCDAsyncSocket *)sock shouldFinishConnectionWithTrust:(SecTrustRef)trust status:(OSStatus)status {
-    __block BOOL result = YES;
-    GCDMulticastDelegateEnumerator *delegateEnumerator = [multicastDelegate delegateEnumerator];
-    id delegate;
-    dispatch_queue_t delegateQueue;
-    SEL selector = @selector(socket:shouldFinishConnectionWithTrust:status:);
-    while ([delegateEnumerator getNextDelegate:&delegate delegateQueue:&delegateQueue forSelector:selector])
-    {
-        dispatch_sync(delegateQueue, ^{ @autoreleasepool {
-            
-            result = [delegate socket:sock shouldFinishConnectionWithTrust:trust status:status];
-        }});
-    }
-    return result;
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Registration
@@ -3952,7 +3894,44 @@ enum XMPPStreamConfig
 	}
 }
 
-- (void)socketDidSecure:(GCDAsyncSocket *)socket
+- (void)socket:(GCDAsyncSocket *)sock didReceiveTrust:(SecTrustRef)trust
+                                    completionHandler:(void (^)(BOOL shouldTrustPeer))completionHandler
+{
+	XMPPLogTrace();
+	
+	SEL selector = @selector(xmppStream:didReceiveTrust:completionHandler:);
+	
+	if ([multicastDelegate hasDelegateThatRespondsToSelector:selector])
+	{
+		[multicastDelegate xmppStream:self didReceiveTrust:trust completionHandler:completionHandler];
+	}
+	else
+	{
+		XMPPLogWarn(@"%@: Stream secured with (GCDAsyncSocketManuallyEvaluateTrust == YES),"
+		            @" but there are no delegates that implement xmppStream:didReceiveTrust:completionHandler:."
+		            @" This is likely a mistake.", THIS_FILE);
+		
+		// The delegate method should likely have code similar to this,
+		// but will presumably perform some extra security code stuff.
+		// For example, allowing a specific self-signed certificate that is known to the app.
+		
+		dispatch_queue_t bgQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+		dispatch_async(bgQueue, ^{
+			
+			SecTrustResultType result = kSecTrustResultDeny;
+			OSStatus status = SecTrustEvaluate(trust, &result);
+			
+			if (status == noErr && (result == kSecTrustResultProceed || result == kSecTrustResultUnspecified)) {
+				completionHandler(YES);
+			}
+			else {
+				completionHandler(NO);
+			}
+		});
+	}
+}
+
+- (void)socketDidSecure:(GCDAsyncSocket *)sock
 {
 	// This method is invoked on the xmppQueue.
 	XMPPLogTrace();
