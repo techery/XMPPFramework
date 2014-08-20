@@ -2,9 +2,3 @@
 	path = Vendor/facebook-ios-sdk
 	url = git://github.com/facebook/facebook-ios-sdk.git
 	ignore = dirty
-[submodule "Vendor/CocoaAsyncSocket"]
-	path = Vendor/CocoaAsyncSocket
-	url = git@github.com:ChatSecure/CocoaAsyncSocket.git
-[submodule "Vendor/AFNetworking"]
-	path = Vendor/AFNetworking
-	url = git@github.com:AFNetworking/AFNetworking.git
