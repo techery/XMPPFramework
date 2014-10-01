@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import "XMPPSASLAuthentication.h"
-#import "GCDAsyncProxySocket.h"
+#import "XMPPCustomBinding.h"
+#import "GCDAsyncSocket.h"
 #import "GCDMulticastDelegate.h"
 
 #if TARGET_OS_IPHONE
@@ -215,10 +216,16 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
  * the count will be the summation of all connections.
  * 
  * The functionality may optionaly be changed to count only the current socket connection.
- * See the resetByteCountPerConnection property.
+ * @see resetByteCountPerConnection
 **/
-@property (readonly) UInt64 numberOfBytesSent;
-@property (readonly) UInt64 numberOfBytesReceived;
+@property (readonly) uint64_t numberOfBytesSent;
+@property (readonly) uint64_t numberOfBytesReceived;
+
+/**
+ * Same as the individual properties,
+ * but provides a way to fetch them in one atomic operation.
+**/
+- (void)getNumberOfBytesSent:(uint64_t *)bytesSentPtr numberOfBytesReceived:(uint64_t *)bytesReceivedPtr;
 
 /**
  * Affects the funtionality of the byte counter.
@@ -327,7 +334,10 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
  * The given address is specified as a sockaddr structure wrapped in a NSData object.
  * For example, a NSData object returned from NSNetservice's addresses method.
 **/
-- (BOOL)connectTo:(XMPPJID *)remoteJID withAddress:(NSData *)remoteAddr withTimeout:(NSTimeInterval)timeout error:(NSError **)errPtr;
+- (BOOL)connectTo:(XMPPJID *)remoteJID
+      withAddress:(NSData *)remoteAddr
+      withTimeout:(NSTimeInterval)timeout
+            error:(NSError **)errPtr;
 
 /**
  * Starts a P2P connection with the given accepted socket.
@@ -898,6 +908,19 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
 - (void)xmppStream:(XMPPStream *)sender didNotAuthenticate:(NSXMLElement *)error;
 
 /**
+ * Binding a JID resource is a standard part of the authentication process,
+ * and occurs after SASL authentication completes (which generally authenticates the JID username).
+ * 
+ * This delegate method allows for a custom binding procedure to be used.
+ * For example:
+ * - a custom SASL authentication scheme might combine auth with binding
+ * - stream management (xep-0198) replaces binding if it can resume a previous session
+ * 
+ * Return nil (or don't implement this method) if you wish to use the standard binding procedure.
+**/
+- (id <XMPPCustomBinding>)xmppStreamWillBind:(XMPPStream *)sender;
+
+/**
  * This method is called if the XMPP server doesn't allow our resource of choice
  * because it conflicts with an existing resource.
  * 
@@ -929,6 +952,14 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
 - (XMPPIQ *)xmppStream:(XMPPStream *)sender willReceiveIQ:(XMPPIQ *)iq;
 - (XMPPMessage *)xmppStream:(XMPPStream *)sender willReceiveMessage:(XMPPMessage *)message;
 - (XMPPPresence *)xmppStream:(XMPPStream *)sender willReceivePresence:(XMPPPresence *)presence;
+
+/**
+ * This method is called if any of the xmppStream:willReceiveX: methods filter the incoming stanza.
+ * 
+ * It may be useful for some extensions to know that something was received,
+ * even if it was filtered for some reason.
+**/
+- (void)xmppStreamDidFilterStanza:(XMPPStream *)sender;
 
 /**
  * These methods are called after their respective XML elements are received on the stream.
@@ -993,6 +1024,7 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
 
 /**
  * These methods are called after failing to send the respective XML elements over the stream.
+ * This occurs when the stream gets disconnected before the element can get sent out.
 **/
 - (void)xmppStream:(XMPPStream *)sender didFailToSendIQ:(XMPPIQ *)iq error:(NSError *)error;
 - (void)xmppStream:(XMPPStream *)sender didFailToSendMessage:(XMPPMessage *)message error:(NSError *)error;
@@ -1006,11 +1038,31 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
 /**
  * This method is called if the disconnect method is called.
  * It may be used to determine if a disconnection was purposeful, or due to an error.
+ * 
+ * Note: A disconnect may be either "clean" or "dirty".
+ * A "clean" disconnect is when the stream sends the closing </stream:stream> stanza before disconnecting.
+ * A "dirty" disconnect is when the stream simply closes its TCP socket.
+ * In most cases it makes no difference how the disconnect occurs,
+ * but there are a few contexts in which the difference has various protocol implications.
+ * 
+ * @see xmppStreamDidSendClosingStreamStanza
 **/
 - (void)xmppStreamWasToldToDisconnect:(XMPPStream *)sender;
 
 /**
- * This methods is called if the XMPP Stream's connect times out
+ * This method is called after the stream has sent the closing </stream:stream> stanza.
+ * This signifies a "clean" disconnect.
+ * 
+ * Note: A disconnect may be either "clean" or "dirty".
+ * A "clean" disconnect is when the stream sends the closing </stream:stream> stanza before disconnecting.
+ * A "dirty" disconnect is when the stream simply closes its TCP socket.
+ * In most cases it makes no difference how the disconnect occurs,
+ * but there are a few contexts in which the difference has various protocol implications.
+**/
+- (void)xmppStreamDidSendClosingStreamStanza:(XMPPStream *)sender;
+
+/**
+ * This methods is called if the XMPP stream's connect times out.
 **/
 - (void)xmppStreamConnectDidTimeout:(XMPPStream *)sender;
 
@@ -1021,7 +1073,9 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
  * Some examples:
  * - The TCP socket was unexpectedly disconnected.
  * - The SRV resolution of the domain failed.
- * - Error parsing xml sent from server. 
+ * - Error parsing xml sent from server.
+ * 
+ * @see xmppStreamConnectDidTimeout:
 **/
 - (void)xmppStreamDidDisconnect:(XMPPStream *)sender withError:(NSError *)error;
 
@@ -1050,5 +1104,21 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
 **/
 - (void)xmppStream:(XMPPStream *)sender didRegisterModule:(id)module;
 - (void)xmppStream:(XMPPStream *)sender willUnregisterModule:(id)module;
+
+/**
+ * Custom elements are Non-XMPP elements.
+ * In other words, not <iq>, <message> or <presence> elements.
+ * 
+ * Typically these kinds of elements are not allowed by the XMPP server.
+ * But some custom implementations may use them.
+ * The standard example is XEP-0198, which uses <r> & <a> elements.
+ * 
+ * If you're using custom elements, you must register the custom element name(s).
+ * Otherwise the xmppStream will treat non-XMPP elements as errors (xmppStream:didReceiveError:).
+ * 
+ * @see registerCustomElementNames (in XMPPInternal.h)
+**/
+- (void)xmppStream:(XMPPStream *)sender didSendCustomElement:(NSXMLElement *)element;
+- (void)xmppStream:(XMPPStream *)sender didReceiveCustomElement:(NSXMLElement *)element;
 
 @end
