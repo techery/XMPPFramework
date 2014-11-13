@@ -27,57 +27,6 @@
   "default_subspec": "All",
   "subspecs": [
     {
-      "name":"All",
-      "dependencies": {
-        "XMPPFramework/Authentication": [],
-        "XMPPFramework/Categories": [],
-        "XMPPFramework/Utilities": [],
-        "XMPPFramework/BandwidthMonitor" : [],
-        "XMPPFramework/CoreDataStorage" : [],
-        "XMPPFramework/GoogleSharedStatus" : [],
-        "XMPPFramework/ProcessOne" : [],
-        "XMPPFramework/Reconnect" : [],
-        "XMPPFramework/Roster" : [],
-        "XMPPFramework/XEP-0009" : [],
-        "XMPPFramework/XEP-0012" : [],
-        "XMPPFramework/XEP-0016" : [],
-        "XMPPFramework/XEP-0045" : [],
-        "XMPPFramework/XEP-0054" : [],
-        "XMPPFramework/XEP-0059" : [],
-        "XMPPFramework/XEP-0060" : [],
-        "XMPPFramework/XEP-0065" : [],
-        "XMPPFramework/XEP-0066" : [],
-        "XMPPFramework/XEP-0082" : [],
-        "XMPPFramework/XEP-0085" : [],
-        "XMPPFramework/XEP-0092" : [],
-        "XMPPFramework/XEP-0100" : [],
-        "XMPPFramework/XEP-0106" : [],
-        "XMPPFramework/XEP-0115" : [],
-        "XMPPFramework/XEP-0136" : [],
-        "XMPPFramework/XEP-0153" : [],
-        "XMPPFramework/XEP-0172" : [],
-        "XMPPFramework/XEP-0184" : [],
-        "XMPPFramework/XEP-0191" : [],
-        "XMPPFramework/XEP-0198" : [],
-        "XMPPFramework/XEP-0199" : [],
-        "XMPPFramework/XEP-0202" : [],
-        "XMPPFramework/XEP-0203" : [],
-        "XMPPFramework/XEP-0223" : [],
-        "XMPPFramework/XEP-0224" : [],
-        "XMPPFramework/XEP-0280" : [],
-        "XMPPFramework/XEP-0297" : [],
-        "XMPPFramework/XEP-0308" : [],
-        "XMPPFramework/XEP-0333" : [],
-        "XMPPFramework/XEP-0335" : []
-        },
-        "osx" : {
-          "dependencies": {
-            "XMPPFramework/SystemInputActivityMonitor" : []
-          }
-          
-        }
-    },
-    {
       "name": "Core",
       "source_files": [
         "XMPPFramework.h",
@@ -94,6 +43,15 @@
         "LIBRARY_SEARCH_PATHS": "\"$(PODS_ROOT)/XMPPFramework/Vendor/libidn\""
       },
       "dependencies": {
+        "XMPPFramework/Authentication": [
+
+        ],
+        "XMPPFramework/Categories": [
+
+        ],
+        "XMPPFramework/Utilities": [
+
+        ],
         "CocoaLumberjack": [
           "~>1.9"
         ],
@@ -138,7 +96,12 @@
     },
     {
       "name": "KissXML",
-      "source_files": "Vendor/KissXML/**/*.{h,m}"
+      "source_files": "Vendor/KissXML/**/*.{h,m}",
+      "dependencies": {
+        "XMPPFramework/Core": [
+
+        ]
+      }
     },
     {
       "name": "BandwidthMonitor",
@@ -342,16 +305,6 @@
       "prefix_header_contents": "#define HAVE_XMPP_SUBSPEC_XEP_0085"
     },
     {
-      "name": "XEP-0092",
-      "source_files": "Extensions/XEP-0092/**/*.{h,m}",
-      "dependencies": {
-        "XMPPFramework/Core": [
-
-        ]
-      },
-      "prefix_header_contents": "#define HAVE_XMPP_SUBSPEC_XEP_0092"
-    },
-    {
       "name": "XEP-0100",
       "source_files": "Extensions/XEP-0100/**/*.{h,m}",
       "dependencies": {
@@ -408,6 +361,9 @@
       "source_files": "Extensions/XEP-0153/**/*.{h,m}",
       "dependencies": {
         "XMPPFramework/Core": [
+
+        ],
+        "XMPPFramework/XEP-0054": [
 
         ]
       },
