@@ -29,6 +29,9 @@
     {
       "name": "All",
       "dependencies" : {
+        "XMPPFramework/Authentication": [],
+        "XMPPFramework/Categories": [],
+        "XMPPFramework/Utilities": [],
         "XMPPFramework/BandwidthMonitor" : [],
         "XMPPFramework/CoreDataStorage" : [],
         "XMPPFramework/GoogleSharedStatus" : [],
