@@ -6,7 +6,6 @@
 //  Copyright 2011 RF.com. All rights reserved.
 
 #import "XMPPvCardAvatarModule.h"
-
 #import "NSData+XMPP.h"
 #import "NSXMLElement+XMPP.h"
 #import "XMPPLogging.h"
