@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import "XMPPSASLAuthentication.h"
 #import "XMPPCustomBinding.h"
-#import "GCDAsyncSocket.h"
+#import "GCDAsyncProxySocket.h"
 #import "GCDMulticastDelegate.h"
 
 #if TARGET_OS_IPHONE
@@ -26,6 +26,8 @@
   #define MIN_KEEPALIVE_INTERVAL      10.0 // 10 Seconds
   #define DEFAULT_KEEPALIVE_INTERVAL 300.0 //  5 Minutes
 #endif
+
+#define kXMPP_CERT_PINNING_KEY @"kXMPP_CERT_PINNING_KEY"
 
 extern NSString *const XMPPStreamErrorDomain;
 
@@ -119,6 +121,11 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
  * @see XMPPStreamStartTLSPolicy
 **/
 @property (readwrite, assign) XMPPStreamStartTLSPolicy startTLSPolicy;
+
+/**
+ * The connected servers hostname. The last attempted hostname before the socket actually connects to an IP address
+**/
+@property (nonatomic,readonly) NSString *connectedHostName;
 
 /**
  * The JID of the user.
@@ -361,6 +368,12 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
  * Attempting to send elements after this method has been called will not work (the elements won't get sent).
 **/
 - (void)disconnectAfterSending;
+
+/**
+ * Sets SOCKS proxy host and port
+**/
+- (void) setProxyHost:(NSString*)host port:(uint16_t)port version:(GCDAsyncSocketSOCKSVersion)version;
+- (void) setProxyUsername:(NSString *)username password:(NSString*)password; // TODO
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Security

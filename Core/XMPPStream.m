@@ -882,6 +882,17 @@ enum XMPPStreamConfig
 		flags &= ~kDidStartNegotiation;
 }
 
+- (void) setProxyHost:(NSString*)host port:(uint16_t)port version:(GCDAsyncSocketSOCKSVersion)version {
+    asyncSocket = [[GCDAsyncProxySocket alloc] initWithDelegate:self delegateQueue:xmppQueue];
+    [(GCDAsyncProxySocket *)asyncSocket setProxyHost:host port:port version:version];
+}
+
+- (void) setProxyUsername:(NSString *)username password:(NSString*)password {
+    asyncSocket = [[GCDAsyncProxySocket alloc] initWithDelegate:self delegateQueue:xmppQueue];
+    [(GCDAsyncProxySocket *)asyncSocket setProxyUsername:username password:password];
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Connection State
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1035,7 +1046,9 @@ enum XMPPStreamConfig
 	NSAssert(dispatch_get_specific(xmppQueueTag), @"Invoked on incorrect queue");
 	
 	XMPPLogTrace();
-	
+    
+    _connectedHostName = [host copy];
+    
 	BOOL result = [asyncSocket connectToHost:host onPort:port error:errPtr];
 	
 	if (result && [self resetByteCountPerConnection])
@@ -1255,7 +1268,8 @@ enum XMPPStreamConfig
 		state = STATE_XMPP_CONNECTING;
 		
 		// Initailize socket
-		asyncSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:xmppQueue];
+		asyncSocket = [[GCDAsyncSocket alloc] initWithDelegate:self
+                                                 delegateQueue:xmppQueue];
 		
 		NSError *connectErr = nil;
 		result = [asyncSocket connectToAddress:remoteAddr error:&connectErr];
@@ -1343,7 +1357,7 @@ enum XMPPStreamConfig
 		NSAssert((asyncSocket == nil), @"Forgot to release the previous asyncSocket instance.");
 		
 		// Store and configure socket
-		asyncSocket = acceptedSocket;
+		asyncSocket = (GCDAsyncProxySocket*)acceptedSocket;
 		[asyncSocket setDelegate:self delegateQueue:xmppQueue];
 		
 		// Notify delegates
@@ -1965,7 +1979,7 @@ enum XMPPStreamConfig
 		}
 		else if ([self supportsDeprecatedPlainAuthentication])
 		{
-			someAuth = [[XMPPDeprecatedDigestAuthentication alloc] initWithStream:self password:password];
+			someAuth = [[XMPPDeprecatedPlainAuthentication alloc] initWithStream:self password:password];
 			result = [self authenticate:someAuth error:&err];
 		}
 		else
@@ -4078,6 +4092,7 @@ enum XMPPStreamConfig
 		
 		if (success)
 		{
+        
 			break;
 		}
 		else
@@ -4230,7 +4245,6 @@ enum XMPPStreamConfig
 - (void)socketDidSecure:(GCDAsyncSocket *)sock
 {
 	// This method is invoked on the xmppQueue.
-	
 	XMPPLogTrace();
 	
 	[multicastDelegate xmppStreamDidSecure:self];
@@ -4307,6 +4321,8 @@ enum XMPPStreamConfig
 - (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err
 {
 	// This method is invoked on the xmppQueue.
+    
+    _connectedHostName = nil;
 	
 	XMPPLogTrace();
     
