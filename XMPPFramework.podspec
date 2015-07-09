@@ -48,7 +48,7 @@ core.libraries = 'xml2','resolv'
 core.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 $(SDKROOT)/usr/include/libresolv',
 'LIBRARY_SEARCH_PATHS' => '"$(PODS_ROOT)/XMPPFramework/Vendor/libidn"'}
 
-#core.dependency 'ProxyKit','~>1.0'
+core.dependency 'ProxyKit','~>1.0'
 #core.dependency 'XMPPFramework/Authentication'
 #core.dependency 'XMPPFramework/Categories'
 #core.dependency 'XMPPFramework/Utilities'
