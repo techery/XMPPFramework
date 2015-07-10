@@ -1,15 +1,15 @@
 Pod::Spec.new do |s|
 s.name = 'XMPPFramework'
 s.version = '3.6.5'
-s.ios.deployment_target = '5.0'
-#s.osx.deployment_target = '10.7'
+s.ios.deployment_target = '6.0'
+s.osx.deployment_target = '10.7'
 
 #s.platform = { 'ios' => '5.0',  'osx' => '10.7'}
-s.platform = :ios, '5.0'
-#s.platform = :osx, '10.7'
+s.platform = :ios, '6.0'
+s.platform = :osx, '10.7'
 
 s.ios.frameworks = 'UIKit', 'Foundation'
-#s.osx.frameworks = 'Cocoa'
+s.osx.frameworks = 'Cocoa'
 
 s.license = { :type => 'BSD', :file => 'copying.txt' }
 s.summary = 'An XMPP Framework in Objective-C for the Mac / iOS development community.'
@@ -120,12 +120,12 @@ ss.dependency 'XMPPFramework/CoreDataStorage'
 ss.prefix_header_contents = "#define HAVE_XMPP_SUBSPEC_#{name.upcase.sub('-', '_')}"
 end
 
-#s.subspec 'SystemInputActivityMonitor' do |ss|
-#ss.source_files = ['Extensions/SystemInputActivityMonitor/**/*.{h,m}', 'Extensions/XEP-0203/XMPPModule.h']
-#ss.dependency 'XMPPFramework/Core'
+s.subspec 'SystemInputActivityMonitor' do |ss|
+ss.source_files = ['Extensions/SystemInputActivityMonitor/**/*.{h,m}', 'Utilities/GCDMulticastDelegate.h']
+ss.dependency 'XMPPFramework/Core'
 #ss.dependency 'XMPPFramework/XEP-0203'
-#ss.prefix_header_contents = "#define HAVE_XMPP_SUBSPEC_#{name.upcase.sub('-', '_')}"
-#end
+ss.prefix_header_contents = "#define HAVE_XMPP_SUBSPEC_#{name.upcase.sub('-', '_')}"
+end
 
 s.subspec 'XEP-0009' do |ss|
 ss.source_files = 'Extensions/XEP-0009/**/*.{h,m}'
@@ -269,11 +269,11 @@ ss.dependency 'XMPPFramework/Core'
 ss.prefix_header_contents = "#define HAVE_XMPP_SUBSPEC_#{name.upcase.sub('-', '_')}"
 end
 
-#s.subspec 'XEP-0199' do |ss|
-#ss.source_files = 'Extensions/XEP-0199/**/*.{h,m}'
-#ss.dependency 'XMPPFramework/Core'
-#ss.prefix_header_contents = "#define HAVE_XMPP_SUBSPEC_#{name.upcase.sub('-', '_')}"
-#end
+s.subspec 'XEP-0199' do |ss|
+ss.source_files = 'Extensions/XEP-0199/**/*.{h,m}'
+ss.dependency 'XMPPFramework/Core'
+ss.prefix_header_contents = "#define HAVE_XMPP_SUBSPEC_#{name.upcase.sub('-', '_')}"
+end
 
 s.subspec 'XEP-0202' do |ss|
 ss.source_files = 'Extensions/XEP-0202/**/*.{h,m}'
@@ -283,7 +283,7 @@ ss.prefix_header_contents = "#define HAVE_XMPP_SUBSPEC_#{name.upcase.sub('-', '_
 end
 
 s.subspec 'XEP-0203' do |ss|
-ss.source_files = 'Extensions/XEP-0199/**/*.{h,m}'
+ss.source_files = 'Extensions/XEP-0203/**/*.{h,m}'
 ss.dependency 'XMPPFramework/Core'
 ss.dependency 'XMPPFramework/XEP-0082'
 ss.prefix_header_contents = "#define HAVE_XMPP_SUBSPEC_#{name.upcase.sub('-', '_')}"
