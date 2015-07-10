@@ -1,12 +1,14 @@
 Pod::Spec.new do |s|
 s.name = 'XMPPFramework'
 s.version = '3.6.5'
-s.ios.deployment_target = '6.0'
+
 s.osx.deployment_target = '10.7'
+s.ios.deployment_target = '5.0'
 
 #s.platform = { 'ios' => '5.0',  'osx' => '10.7'}
-s.platform = :ios, '6.0'
+
 s.platform = :osx, '10.7'
+s.platform = :ios, '5.0'
 
 s.ios.frameworks = 'UIKit', 'Foundation'
 s.osx.frameworks = 'Cocoa'
