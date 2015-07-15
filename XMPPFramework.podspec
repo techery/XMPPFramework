@@ -3,12 +3,12 @@ s.name = 'XMPPFramework'
 s.version = '3.6.5'
 
 s.osx.deployment_target = '10.7'
-s.ios.deployment_target = '5.0'
+s.ios.deployment_target = '6.0'
 
 #s.platform = { 'ios' => '5.0',  'osx' => '10.7'}
 
 s.platform = :osx, '10.7'
-s.platform = :ios, '5.0'
+s.platform = :ios, '6.0'
 
 s.ios.frameworks = 'UIKit', 'Foundation'
 s.osx.frameworks = 'Cocoa'
@@ -48,8 +48,8 @@ core.source_files = ['XMPPFramework.h', 'Core/**/*.{h,m}', 'Vendor/libidn/*.h', 
 core.vendored_libraries = 'Vendor/libidn/libidn.a'
 core.libraries = 'xml2','resolv'
 core.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 $(SDKROOT)/usr/include/libresolv',
-'LIBRARY_SEARCH_PATHS' => '"$(PODS_ROOT)/XMPPFramework/Vendor/libidn"'}
-
+'LIBRARY_SEARCH_PATHS' => '"$(PODS_ROOT)/XMPPFramework/Vendor/libidn"', 'OTHER_LDFLAGS' => '"-lxml2"'}
+#, 'OTHER_LDFLAGS' => '"-xml2"'
 core.dependency 'ProxyKit','~>1.0'
 #core.dependency 'XMPPFramework/Authentication'
 #core.dependency 'XMPPFramework/Categories'
