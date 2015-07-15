@@ -79,7 +79,7 @@ s.subspec 'KissXML' do |ss|
 ss.source_files = 'Vendor/KissXML/**/*.{h,m}'
 #ss.dependency 'XMPPFramework/Core'
 ss.libraries = 'xml2','resolv'
-ss.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 $(SDKROOT)/usr/include/libresolv'}
+ss.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 $(SDKROOT)/usr/include/libresolv', 'OTHER_LDFLAGS' => '"-lxml2"'}
 end
 
 s.subspec 'BandwidthMonitor' do |ss|
