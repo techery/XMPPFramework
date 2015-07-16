@@ -47,7 +47,7 @@ core.source_files = ['XMPPFramework.h', 'Core/**/*.{h,m}', 'Vendor/libidn/*.h', 
 #, 'Authentication/**/*.{h,m}', 'Categories/**/*.{h,m}', 'Utilities/**/*.{h,m}'
 core.vendored_libraries = 'Vendor/libidn/libidn.a'
 core.libraries = 'xml2','resolv'
-core.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 $(SDKROOT)/usr/include/libresolv',
+core.xcconfig = { 'HEADER_SEARCH_PATHS' => '/usr/include/libxml2 $(SDKROOT)/usr/include/libresolv',
 'LIBRARY_SEARCH_PATHS' => '"$(PODS_ROOT)/XMPPFramework/Vendor/libidn"', 'OTHER_LDFLAGS' => '"-lxml2"'}
 #, 'OTHER_LDFLAGS' => '"-xml2"'
 core.dependency 'ProxyKit','~>1.0'
@@ -79,7 +79,7 @@ s.subspec 'KissXML' do |ss|
 ss.source_files = 'Vendor/KissXML/**/*.{h,m}'
 #ss.dependency 'XMPPFramework/Core'
 ss.libraries = 'xml2','resolv'
-ss.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 $(SDKROOT)/usr/include/libresolv', 'OTHER_LDFLAGS' => '"-lxml2"'}
+ss.xcconfig = { 'HEADER_SEARCH_PATHS' => '/usr/include/libxml2 $(SDKROOT)/usr/include/libresolv', 'OTHER_LDFLAGS' => '"-lxml2"'}
 end
 
 s.subspec 'BandwidthMonitor' do |ss|
