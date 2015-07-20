@@ -42,6 +42,16 @@ grep '#define _XMPP_' -r /Extensions \
 >> XMPPFramework.h
 END
 
+s.prepare_command = <<-CMD
+cat > "module.map" << MAP
+module libxml [system] {
+header "$SDKROOT/usr/include/libxml2.h"
+link "libxml"
+export *
+}
+MAP
+CMD
+
 s.subspec 'Core' do |core|
 core.source_files = ['XMPPFramework.h', 'Core/**/*.{h,m}', 'Vendor/libidn/*.h', 'Authentication/**/*.{h,m}', 'Categories/**/*.{h,m}', 'Utilities/**/*.{h,m}']
 #, 'Authentication/**/*.{h,m}', 'Categories/**/*.{h,m}', 'Utilities/**/*.{h,m}'
