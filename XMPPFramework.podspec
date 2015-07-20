@@ -45,7 +45,7 @@ END
 s.prepare_command = <<-CMD
 cat > "module.map" << MAP
 module libxml [system] {
-header "$SDKROOT/usr/include/libxml2.h"
+header "$(SDKROOT)/usr/include/libxml2"
 link "libxml"
 export *
 }
