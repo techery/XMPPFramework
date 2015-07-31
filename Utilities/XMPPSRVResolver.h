@@ -6,7 +6,10 @@
 //  
 
 #import <Foundation/Foundation.h>
-#import <dns_sd.h>
+
+@import dnssd;
+
+//#import <dns_sd.h>
 
 extern NSString *const XMPPSRVResolverErrorDomain;
 
