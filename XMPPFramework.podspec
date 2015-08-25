@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name = 'XMPPFramework'
-s.version = '3.6.5'
+s.version = '3.6.6'
 
 s.osx.deployment_target = '10.7'
 s.ios.deployment_target = '6.0'
@@ -42,23 +42,34 @@ grep '#define _XMPP_' -r /Extensions \
 >> XMPPFramework.h
 END
 
-s.prepare_command = <<-CMD
-cat > "module.map" << MAP
-module libxml [system] {
-header "$(SDKROOT)/usr/include/libxml2"
-link "libxml"
-export *
-}
-MAP
-CMD
+#s.prepare_command = <<-CMD
+#cat > "module.map" << MAP
+#module libxml [system] {
+#header "$(SDKROOT)/usr/include/libxml2"
+#link "libxml"
+#export *
+#}
+#MAP
+#CMD
 
+s.module_map = "module/module.modulemap"
 s.subspec 'Core' do |core|
 core.source_files = ['XMPPFramework.h', 'Core/**/*.{h,m}', 'Vendor/libidn/*.h', 'Authentication/**/*.{h,m}', 'Categories/**/*.{h,m}', 'Utilities/**/*.{h,m}']
 #, 'Authentication/**/*.{h,m}', 'Categories/**/*.{h,m}', 'Utilities/**/*.{h,m}'
 core.vendored_libraries = 'Vendor/libidn/libidn.a'
 core.libraries = 'xml2','resolv'
-core.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 $(SDKROOT)/usr/include/libresolv',
-'LIBRARY_SEARCH_PATHS' => '"$(PODS_ROOT)/XMPPFramework/Vendor/libidn"', 'OTHER_LDFLAGS' => '"-lxml2"', 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES'}
+core.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 $(SRCROOT)/module $(PODS_ROOT)/module $(SDKROOT)/usr/include/libresolv',
+'LIBRARY_SEARCH_PATHS' => '"$(PODS_ROOT)/XMPPFramework/Vendor/libidn"', 'OTHER_LDFLAGS' => '"-lxml2"', 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES', 'ENABLE_BITCODE' => 'NO', "SWIFT_INCLUDE_PATHS[sdk=iphoneos*]" => "$(SRCROOT)/module",
+"SWIFT_INCLUDE_PATHS[sdk=iphonesimulator*]" => "$(SRCROOT)/module",}
+
+#"xcconfig": {
+#"SWIFT_INCLUDE_PATHS[sdk=iphoneos*]": "$(SRCROOT)/NetUtils/ifaddrs/iphoneos",
+#"SWIFT_INCLUDE_PATHS[sdk=iphonesimulator*]": "$(SRCROOT)/NetUtils/ifaddrs/iphonesimulator",
+#"SWIFT_INCLUDE_PATHS[sdk=macosx*]": "$(SRCROOT)/NetUtils/ifaddrs/macosx"
+#},
+
+
+#, 'SWIFT_INCLUDE_PATHS[sdk=iphoneos*]' => '$(SRCROOT)/module'
 #, 'OTHER_LDFLAGS' => '"-xml2"'
 #core.dependency 'ProxyKit','~>1.0'
 #core.dependency 'XMPPFramework/Authentication'
