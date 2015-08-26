@@ -1,4 +1,4 @@
-module libxml {
+module libxml [system] [extern_c] {
 	header "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/libxml2/libxml/tree.h"
 	link "libxml"
 	export *
@@ -9,7 +9,7 @@ module libxmlSimu {
 	export *
 }
 
-module dnssd {
+module dnssd [system] [extern_c] {
 	header "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/dns_sd.h"
 	export *
 }
