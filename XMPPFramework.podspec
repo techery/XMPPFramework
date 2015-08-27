@@ -34,6 +34,7 @@ s.requires_arc = true
 # subspecs have been selected, include all of them wrapped in defines which
 # will be set by the relevant subspecs.
 
+s.prepare_command = "injectXcodePath.sh"
 s.prepare_command = <<-'END'
 echo '#import "XMPP.h"' > XMPPFramework.h
 grep '#define _XMPP_' -r /Extensions \
@@ -52,7 +53,7 @@ END
 #MAP
 #CMD
 
-#s.module_map = "module/module.modulemap"
+s.module_map = "module/module.modulemap"
 s.subspec 'Core' do |core|
 core.source_files = ['XMPPFramework.h', 'Core/**/*.{h,m}', 'Vendor/libidn/*.h', 'Authentication/**/*.{h,m}', 'Categories/**/*.{h,m}', 'Utilities/**/*.{h,m}']
 #, 'Authentication/**/*.{h,m}', 'Categories/**/*.{h,m}', 'Utilities/**/*.{h,m}'
