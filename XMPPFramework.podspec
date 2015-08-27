@@ -45,7 +45,7 @@ END
 #s.prepare_command = <<-CMD
 #cat > "module.map" << MAP
 #module libxml [system] {
-#header "$(SDKROOT)/usr/include/libxml2"
+#header "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/libxml2/libxml/tree.h"
 #link "libxml"
 #export *
 #}
@@ -58,10 +58,11 @@ core.source_files = ['XMPPFramework.h', 'Core/**/*.{h,m}', 'Vendor/libidn/*.h', 
 #, 'Authentication/**/*.{h,m}', 'Categories/**/*.{h,m}', 'Utilities/**/*.{h,m}'
 core.vendored_libraries = 'Vendor/libidn/libidn.a'
 core.libraries = 'xml2','resolv'
-core.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 $(SRCROOT)/module $(PODS_ROOT)/module $(SDKROOT)/usr/include/libresolv',
-'LIBRARY_SEARCH_PATHS' => '"$(PODS_ROOT)/XMPPFramework/Vendor/libidn"', 'OTHER_LDFLAGS' => '"-lxml2"', 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES', 'ENABLE_BITCODE' => 'NO', "SWIFT_INCLUDE_PATHS[sdk=iphoneos*]" => "$(SRCROOT)/module",
-"SWIFT_INCLUDE_PATHS[sdk=iphonesimulator*]" => "$(SRCROOT)/module"}
-
+core.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 $(SRCROOT)/module $(SDKROOT)/usr/include/libresolv',
+'LIBRARY_SEARCH_PATHS' => '"$(PODS_ROOT)/XMPPFramework/Vendor/libidn"', 'OTHER_LDFLAGS' => '"-lxml2"', 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES', 'ENABLE_BITCODE' => 'NO'}
+#$(PODS_ROOT)/module
+#, "SWIFT_INCLUDE_PATHS[sdk=iphoneos*]" => "$(SRCROOT)/module",
+#"SWIFT_INCLUDE_PATHS[sdk=iphonesimulator*]" => "$(SRCROOT)/module"
 
 #, 'SWIFT_INCLUDE_PATHS[sdk=iphoneos*]' => '$(SRCROOT)/module'
 #, 'OTHER_LDFLAGS' => '"-xml2"'
@@ -94,9 +95,10 @@ s.subspec 'KissXML' do |ss|
 ss.source_files = 'Vendor/KissXML/**/*.{h,m}'
 #ss.dependency 'XMPPFramework/Core'
 ss.libraries = 'xml2','resolv'
-ss.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 $(SRCROOT)/module $(PODS_ROOT)/module $(SDKROOT)/usr/include/libresolv', 'OTHER_LDFLAGS' => '"-lxml2"'}
+#ss.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 $(SDKROOT)/usr/include/libresolv', 'OTHER_LDFLAGS' => '"-lxml2"'}
 #"SWIFT_INCLUDE_PATHS[sdk=iphoneos*]" => "$(SRCROOT)/module",
 #"SWIFT_INCLUDE_PATHS[sdk=iphonesimulator*]" => "$(SRCROOT)/module"
+#$(SRCROOT)/module $(PODS_ROOT)/module
 end
 
 s.subspec 'BandwidthMonitor' do |ss|
