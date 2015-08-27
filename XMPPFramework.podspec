@@ -43,17 +43,8 @@ s.requires_arc = true
 #>> XMPPFramework.h
 #END
 
-s.prepare_command = <<-CMD
-cat > "module.map" << MAP
-module libxml [system] {
-header "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/libxml2/libxml/tree.h"
-link "libxml"
-export *
-}
-MAP
-CMD
-s.preserve_path = 'module.map'
-s.module_map = "module/module.modulemap"
+#s.preserve_path = 'module.map'
+#s.module_map = "module/module.modulemap"
 s.subspec 'Core' do |core|
 core.source_files = ['XMPPFramework.h', 'Core/**/*.{h,m}', 'Vendor/libidn/*.h', 'Authentication/**/*.{h,m}', 'Categories/**/*.{h,m}', 'Utilities/**/*.{h,m}']
 #, 'Authentication/**/*.{h,m}', 'Categories/**/*.{h,m}', 'Utilities/**/*.{h,m}'
