@@ -34,25 +34,25 @@ s.requires_arc = true
 # subspecs have been selected, include all of them wrapped in defines which
 # will be set by the relevant subspecs.
 
-s.prepare_command = "injectXcodePath.sh"
-s.prepare_command = <<-'END'
+#s.prepare_command = "injectXcodePath.sh"
+s.prepare_command = ['<<-'END'
 echo '#import "XMPP.h"' > XMPPFramework.h
 grep '#define _XMPP_' -r /Extensions \
 | tr '-' '_' \
 | perl -pe 's/Extensions\/([A-z0-9_]*)\/([A-z]*.h).*/\n#ifdef HAVE_XMPP_SUBSPEC_\U\1\n\E#import "\2"\n#endif/' \
 >> XMPPFramework.h
-END
+END',
+' <<-CMD
+cat > "module.map" << MAP
+module libxml [system] {
+header "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/libxml2/libxml/tree.h"
+link "libxml"
+export *
+}
+MAP
+CMD],
 
-#s.prepare_command = <<-CMD
-#cat > "module.map" << MAP
-#module libxml [system] {
-#header "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/libxml2/libxml/tree.h"
-#link "libxml"
-#export *
-#}
-#MAP
-#CMD
-
+s.preserve_path = 'module.map'
 s.module_map = "module/module.modulemap"
 s.subspec 'Core' do |core|
 core.source_files = ['XMPPFramework.h', 'Core/**/*.{h,m}', 'Vendor/libidn/*.h', 'Authentication/**/*.{h,m}', 'Categories/**/*.{h,m}', 'Utilities/**/*.{h,m}']
