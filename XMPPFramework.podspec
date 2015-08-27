@@ -52,7 +52,7 @@ END
 #MAP
 #CMD
 
-s.module_map = "module/module.modulemap"
+#s.module_map = "module/module.modulemap"
 s.subspec 'Core' do |core|
 core.source_files = ['XMPPFramework.h', 'Core/**/*.{h,m}', 'Vendor/libidn/*.h', 'Authentication/**/*.{h,m}', 'Categories/**/*.{h,m}', 'Utilities/**/*.{h,m}']
 #, 'Authentication/**/*.{h,m}', 'Categories/**/*.{h,m}', 'Utilities/**/*.{h,m}'
