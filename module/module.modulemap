@@ -2,6 +2,7 @@ module libxml {
 	header "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/libxml2/libxml/tree.h"
 	//link "libxml"
 	export *
+	module * { export * }
 }
 
 module libxmlSimu {
