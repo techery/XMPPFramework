@@ -4,10 +4,3 @@ module libxml [system] {
 	link "libxml"
 	export *
 }
-
-module dnssd [system] {
-	umbrella header "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/dns_sd.h"
-	header "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/dns_sd.h"
-	link "dnssd"
-	export *
-}
