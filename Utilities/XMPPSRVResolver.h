@@ -7,7 +7,7 @@
 
 #import <Foundation/Foundation.h>
 
-@import dnssd;
+@import libxml; //dnssd;
 
 //#import <dns_sd.h>
 
