@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 //#import <libxml/tree.h>
 //@import libxml;
-#if
+#if !(TARGET_IPHONE_SIMULATOR)
 @import ONEModule.libxml;
 #else
 @import ONEModule.libxmlSimu;
