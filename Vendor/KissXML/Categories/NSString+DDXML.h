@@ -1,6 +1,10 @@
 #import <Foundation/Foundation.h>
 //#import <libxml/tree.h>
-@import libxml;
+//@import libxml;
+@import ONEModule.libxml;
+#else
+@import ONEModule.libxmlSimu;
+#endif
 
 @interface NSString (DDXML)
 

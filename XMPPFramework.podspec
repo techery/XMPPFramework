@@ -32,22 +32,23 @@ s.requires_arc = true
 # subspecs have been selected, include all of them wrapped in defines which
 # will be set by the relevant subspecs.
 
-s.preserve_path = 'module/module.modulemap'
+#s.preserve_path = 'module/module.modulemap'
 s.module_map = 'module/module.modulemap'
 
 s.subspec 'Core' do |core|
 core.source_files = ['XMPPFramework.h', 'Core/**/*.{h,m}', 'Vendor/libidn/*.h', 'Authentication/**/*.{h,m}', 'Categories/**/*.{h,m}', 'Utilities/**/*.{h,m}']
 core.vendored_libraries = 'Vendor/libidn/libidn.a'
 core.libraries = 'xml2', 'resolv'
-core.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 "${SDK_DIR}"/usr/include/libxml2 $(PODS_ROOT)/module $(SDKROOT)/usr/include/libresolv',
-'LIBRARY_SEARCH_PATHS' => '"$(PODS_ROOT)/XMPPFramework/Vendor/libidn" "/usr/include/libxml2" "${SDK_DIR}"/usr/include/libxml2', 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES', 'OTHER_LDFLAGS' => '"-lxml2"', 'ENABLE_BITCODE' => 'NO'
+core.pod_target_xcconfig = { 'HEADER_SEARCH_PATHS[sdk=iphoneos*]' => '$(SDKROOT)/usr/include/libxml2 "${SDK_DIR}"/usr/include/libxml2 $(PODS_ROOT)/module $(SDKROOT)/usr/include/libresolv',
+'HEADER_SEARCH_PATHS[sdk=iphonesimulator*]' => '$(SDKROOT)/usr/include/libxml2 "${SDK_DIR}"/usr/include/libxml2 $(PODS_ROOT)/module $(SDKROOT)/usr/include/libresolv',
+'LIBRARY_SEARCH_PATHS' => '"$(PODS_ROOT)/XMPPFramework/Vendor/libidn" "/usr/include/libxml2" "${SDK_DIR}"/usr/include/libxml2', 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES', 'OTHER_LDFLAGS' => '"$(inherited)" "-lxml2" "-objc"', 'ENABLE_BITCODE' => 'NO', 'CLANG_MODULES_AUTOLINK' => 'YES'
 }
-#$(SDKROOT)/usr/include/libxml2 "${SDK_DIR}"/usr/include/libxml2
-core.pod_target_xcconfig = { 'HEADER_SEARCH_PATHS' => '$(PODS_ROOT)/XMPPFramework/module $(SDKROOT)/usr/include/libresolv'
-}
-#, 'LIBRARY_SEARCH_PATHS' => '"$(PODS_ROOT)/XMPPFramework/Vendor/libidn"'
-# "/usr/include/libxml2" "${SDK_DIR}"/usr/include/libxml2
-#, 'OTHER_LDFLAGS' => '"-lxml2"'
+
+#core.xcconfig
+#'ONLY_ACTIVE_ARCH' => 'NO', 'VALID_ARCHS' => 'armv7 armv7s arm64'
+# i386 x86_64
+#core.pod_target_xcconfig = { 'HEADER_SEARCH_PATHS' => '$(PODS_ROOT)/XMPPFramework/module', 'OTHER_LDFLAGS' => '"$(inherited)" "-lxml2"'
+#}
 
 core.dependency 'CocoaLumberjack','~>1.9'
 core.dependency 'CocoaAsyncSocket','~>7.4.1'
@@ -68,8 +69,10 @@ end
 
 s.subspec 'KissXML' do |ss|
 ss.source_files = 'Vendor/KissXML/**/*.{h,m}'
-ss.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 $(PODS_ROOT)/XMPPFramework/module $(SDKROOT)/usr/include/libresolv', 'OTHER_LDFLAGS' => '"-lxml2"'}
 ss.libraries = 'xml2','resolv'
+ss.xcconfig = { 'HEADER_SEARCH_PATHS[sdk=iphoneos*]' => '$(SDKROOT)/usr/include/libxml2 $(PODS_ROOT)/XMPPFramework/module $(SDKROOT)/usr/include/libresolv', 'OTHER_LDFLAGS' => '"$(inherited)" "-lxml2"',
+'HEADER_SEARCH_PATHS[sdk=iphonesimulator*]' => '$(SDKROOT)/usr/include/libxml2 $(PODS_ROOT)/XMPPFramework/module $(SDKROOT)/usr/include/libresolv', 'OTHER_LDFLAGS' => '"$(inherited)" "-lxml2"',
+'LIBRARY_SEARCH_PATHS' => '"$(PODS_ROOT)/XMPPFramework/Vendor/libidn" "/usr/include/libxml2" "${SDK_DIR}"/usr/include/libxml2', 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES', 'CLANG_MODULES_AUTOLINK' => 'YES'}
 end
 
 s.subspec 'BandwidthMonitor' do |ss|
