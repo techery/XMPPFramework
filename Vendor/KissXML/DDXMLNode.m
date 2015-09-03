@@ -1,7 +1,6 @@
 #import "DDXMLPrivate.h"
 #import "NSString+DDXML.h"
 
-#import <libxml/tree.h>
 #import <libxml/xpath.h>
 #import <libxml/xpathInternals.h>
 
