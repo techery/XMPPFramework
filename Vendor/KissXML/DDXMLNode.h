@@ -1,9 +1,9 @@
 #import <Foundation/Foundation.h>
 //#import <libxml/tree.h>
 #if !(TARGET_IPHONE_SIMULATOR)
-@import ONEModule.libxml;
+@import libxml;
 #else
-@import ONEModule.libxmlSimu;
+@import libxmlSimu;
 #endif
 
 @class DDXMLDocument;

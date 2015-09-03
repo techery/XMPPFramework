@@ -11,9 +11,9 @@
 
 //#import <dns_sd.h>
 #if !(TARGET_IPHONE_SIMULATOR)
-@import ONEModule.dnssd;
+@import dnssd;
 #else
-@import ONEModule.dnssdSimu;
+@import dnssdSimu;
 #endif
 
 extern NSString *const XMPPSRVResolverErrorDomain;
