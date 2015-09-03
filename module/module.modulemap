@@ -4,6 +4,8 @@ module libxml [system] {
 //	module * {
 //		export *
 //	}
+	link "libxml"
+	export *
 }
 /*
 module libxmlSimu [system] {
