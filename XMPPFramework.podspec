@@ -5,8 +5,6 @@ s.version = '3.6.6'
 s.osx.deployment_target = '10.7'
 s.ios.deployment_target = '6.0'
 
-#s.platform = { 'ios' => '5.0',  'osx' => '10.7'}
-
 s.platform = :osx, '10.7'
 s.platform = :ios, '6.0'
 
@@ -34,61 +32,44 @@ s.requires_arc = true
 # subspecs have been selected, include all of them wrapped in defines which
 # will be set by the relevant subspecs.
 
-#s.prepare_command = <<-'END'
-#echo '#import "XMPP.h"' > XMPPFramework.h
-#grep '#define _XMPP_' -r /Extensions \
-#| tr '-' '_' \
-#| perl -pe 's/Extensions\/([A-z0-9_]*)\/([A-z]*.h).*/\n#ifdef HAVE_XMPP_SUBSPEC_\U\1\n\E#import "\2"\n#endif/' \
-#>> XMPPFramework.h
-#END
+s.preserve_path = 'module/module.modulemap'
+s.module_map = 'module/module.modulemap'
 
-#s.module_map = "module/module.modulemap"
 s.subspec 'Core' do |core|
 core.source_files = ['XMPPFramework.h', 'Core/**/*.{h,m}', 'Vendor/libidn/*.h', 'Authentication/**/*.{h,m}', 'Categories/**/*.{h,m}', 'Utilities/**/*.{h,m}']
-#, 'Authentication/**/*.{h,m}', 'Categories/**/*.{h,m}', 'Utilities/**/*.{h,m}'
 core.vendored_libraries = 'Vendor/libidn/libidn.a'
-core.libraries = 'xml2','resolv'
-core.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 $(PODS_ROOT)/XMPPFramework/module $(SDKROOT)/usr/include/libresolv',
-'LIBRARY_SEARCH_PATHS' => '"$(PODS_ROOT)/XMPPFramework/Vendor/libidn"', 'OTHER_LDFLAGS' => '"-lxml2"', 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES', 'ENABLE_BITCODE' => 'NO'}
-#$(PODS_ROOT)/module
-#, "SWIFT_INCLUDE_PATHS[sdk=iphoneos*]" => "$(SRCROOT)/module",
-#"SWIFT_INCLUDE_PATHS[sdk=iphonesimulator*]" => "$(SRCROOT)/module"
+core.libraries = 'xml2', 'resolv'
+core.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 "${SDK_DIR}"/usr/include/libxml2 $(PODS_ROOT)/module $(SDKROOT)/usr/include/libresolv',
+'LIBRARY_SEARCH_PATHS' => '"$(PODS_ROOT)/XMPPFramework/Vendor/libidn" "/usr/include/libxml2" "${SDK_DIR}"/usr/include/libxml2', 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES', 'OTHER_LDFLAGS' => '"-lxml2"', 'ENABLE_BITCODE' => 'NO'
+}
+#$(SDKROOT)/usr/include/libxml2 "${SDK_DIR}"/usr/include/libxml2
+core.pod_target_xcconfig = { 'HEADER_SEARCH_PATHS' => '$(PODS_ROOT)/XMPPFramework/module $(SDKROOT)/usr/include/libresolv'
+}
+#, 'LIBRARY_SEARCH_PATHS' => '"$(PODS_ROOT)/XMPPFramework/Vendor/libidn"'
+# "/usr/include/libxml2" "${SDK_DIR}"/usr/include/libxml2
+#, 'OTHER_LDFLAGS' => '"-lxml2"'
 
-#, 'SWIFT_INCLUDE_PATHS[sdk=iphoneos*]' => '$(SRCROOT)/module'
-#, 'OTHER_LDFLAGS' => '"-xml2"'
-#core.dependency 'ProxyKit','~>1.0'
-#core.dependency 'XMPPFramework/Authentication'
-#core.dependency 'XMPPFramework/Categories'
-#core.dependency 'XMPPFramework/Utilities'
 core.dependency 'CocoaLumberjack','~>1.9'
 core.dependency 'CocoaAsyncSocket','~>7.4.1'
 core.ios.dependency 'XMPPFramework/KissXML'
-#core.osx.dependency 'XMPPFramework/SystemInputActivityMonitor'
 end
 
 s.subspec 'Authentication' do |ss|
-#ss.source_files =  'Authentication/**/*.{h,m}'
 ss.dependency 'XMPPFramework/Core'
 end
 
 s.subspec 'Categories' do |ss|
-#ss.source_files =  'Categories/**/*.{h,m}'
 ss.dependency 'XMPPFramework/Core'
 end
 
 s.subspec 'Utilities' do |ss|
-#ss.source_files =  'Utilities/**/*.{h,m}'
 ss.dependency 'XMPPFramework/Core'
 end
 
 s.subspec 'KissXML' do |ss|
 ss.source_files = 'Vendor/KissXML/**/*.{h,m}'
-#ss.dependency 'XMPPFramework/Core'
+ss.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 $(PODS_ROOT)/XMPPFramework/module $(SDKROOT)/usr/include/libresolv', 'OTHER_LDFLAGS' => '"-lxml2"'}
 ss.libraries = 'xml2','resolv'
-#ss.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 $(SDKROOT)/usr/include/libresolv', 'OTHER_LDFLAGS' => '"-lxml2"'}
-#"SWIFT_INCLUDE_PATHS[sdk=iphoneos*]" => "$(SRCROOT)/module",
-#"SWIFT_INCLUDE_PATHS[sdk=iphonesimulator*]" => "$(SRCROOT)/module"
-#$(SRCROOT)/module $(PODS_ROOT)/module
 end
 
 s.subspec 'BandwidthMonitor' do |ss|
@@ -127,14 +108,12 @@ s.subspec 'Roster' do |ss|
 ss.source_files = 'Extensions/Roster/**/*.{h,m}'
 ss.dependency 'XMPPFramework/Core'
 ss.dependency 'XMPPFramework/CoreDataStorage'
-#ss.dependency 'XMPPFramework/XEP-0203'
 ss.prefix_header_contents = "#define HAVE_XMPP_SUBSPEC_#{name.upcase.sub('-', '_')}"
 end
 
 s.subspec 'SystemInputActivityMonitor' do |ss|
 ss.source_files = ['Extensions/SystemInputActivityMonitor/**/*.{h,m}', 'Utilities/GCDMulticastDelegate.h']
 ss.dependency 'XMPPFramework/Core'
-#ss.dependency 'XMPPFramework/XEP-0203'
 ss.prefix_header_contents = "#define HAVE_XMPP_SUBSPEC_#{name.upcase.sub('-', '_')}"
 end
 
@@ -158,7 +137,6 @@ end
 
 s.subspec 'XEP-0045' do |ss|
 ss.source_files = 'Extensions/XEP-0045/**/*.{h,m}'
-#, 'Extensions/XEP-0203/NSXMLElement+XEP_0203.h']
 ss.dependency 'XMPPFramework/Core'
 ss.dependency 'XMPPFramework/CoreDataStorage'
 ss.dependency 'XMPPFramework/XEP-0203'
@@ -167,13 +145,8 @@ end
 
 s.subspec 'XEP-0054' do |ss|
 ss.source_files = ['Extensions/XEP-0054/**/*.{h,m}', 'Extensions/XEP-0153/XMPPvCardAvatarModule.h', 'Extensions/XEP-0082/XMPPDateTimeProfiles.h', 'Extensions/XEP-0082/NSDate+XMPPDateTimeProfiles.h']
-#, 'Extensions/XEP-0203/NSXMLElement+XEP_0203.h']
-#ss.dependency 'XMPPFramework/XEP-0082'
-
-#ss.dependency 'XMPPFramework/XEP-0203'
 ss.dependency 'XMPPFramework/Core'
 ss.dependency 'XMPPFramework/Roster'
-#ss.dependency 'XMPPFramework/XEP-0153'
 ss.prefix_header_contents = "#define HAVE_XMPP_SUBSPEC_#{name.upcase.sub('-', '_')}"
 ss.framework = 'CoreLocation'
 end
@@ -241,7 +214,6 @@ end
 
 s.subspec 'XEP-0136' do |ss|
 ss.source_files = 'Extensions/XEP-0136/**/*.{h,m}'
-#, 'Extensions/XEP-0203/NSXMLElement+XEP_0203.h']
 ss.dependency 'XMPPFramework/CoreDataStorage'
 ss.dependency 'XMPPFramework/XEP-0203'
 ss.dependency 'XMPPFramework/XEP-0085'
@@ -252,7 +224,6 @@ s.subspec 'XEP-0153' do |ss|
 ss.source_files = ['Extensions/XEP-0153/**/*.{h,m}', 'Extensions/XEP-0082/NSDate+XMPPDateTimeProfiles.h']
 ss.dependency 'XMPPFramework/Core'
 ss.dependency 'XMPPFramework/XEP-0054'
-#ss.dependency 'XMPPFramework/XEP-0082'
 ss.prefix_header_contents = "#define HAVE_XMPP_SUBSPEC_#{name.upcase.sub('-', '_')}"
 end
 
