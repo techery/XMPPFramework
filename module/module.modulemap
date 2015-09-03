@@ -1,4 +1,4 @@
-module ONEModule [system] {
+module ONEModule {
 	explicit module libxml {
 		umbrella header "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/libxml2/libxml/tree.h"
 		export *

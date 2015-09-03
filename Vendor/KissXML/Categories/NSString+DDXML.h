@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 //#import <libxml/tree.h>
-@import libxml;
+//@import libxml;
 #if !(TARGET_IPHONE_SIMULATOR)
 @import ONEModule.libxml;
 #else
