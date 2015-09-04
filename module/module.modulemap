@@ -1,11 +1,5 @@
 module libxml [system] {
-	//umbrella header "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/libxml2/libxml/tree.h"
-	//header "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/libxml2/libxml/tree.h"
 	header "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/libxml2/libxml/tree.h"
-//	module * {
-//		export *
-//	}
-	//link "libxml"
 	export *
 }
 
@@ -15,7 +9,6 @@ module libxmlSimu [system] {
 }
 
 module dnssd [system] {
-	//umbrella header "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/dns_sd.h"
 	header "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/dns_sd.h"
 	export *
 }
