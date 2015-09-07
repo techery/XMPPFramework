@@ -40,7 +40,7 @@ core.source_files = ['XMPPFramework.h', 'Core/**/*.{h,m}', 'Vendor/libidn/*.h', 
 core.vendored_libraries = 'Vendor/libidn/libidn.a'
 core.libraries = 'xml2', 'resolv'
 core.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 "${SDK_DIR}"/usr/include/libxml2 $(PODS_ROOT)/XMPPFramework/module $(SDKROOT)/usr/include/libresolv',
-'LIBRARY_SEARCH_PATHS' => '"$(PODS_ROOT)/XMPPFramework/Vendor/libidn" "/usr/include/libxml2" "${SDK_DIR}"/usr/include/libxml2', 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES', 'OTHER_LDFLAGS' => '"$(inherited)" "-lxml2" "-objc"', 'ENABLE_BITCODE' => 'NO'
+'LIBRARY_SEARCH_PATHS' => '"$(PODS_ROOT)/XMPPFramework/Vendor/libidn" "/usr/include/libxml2" "${SDK_DIR}"/usr/include/libxml2', 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES', 'OTHER_LDFLAGS' => '"$(inherited)" "-lxml2"', 'ENABLE_BITCODE' => 'NO'
 }
 core.dependency 'CocoaLumberjack','~>1.9'
 core.dependency 'CocoaAsyncSocket','~>7.4.1'
@@ -64,7 +64,7 @@ ss.source_files = 'Vendor/KissXML/**/*.{h,m}'
 ss.libraries = 'xml2','resolv'
 ss.xcconfig = {
 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2 $(PODS_ROOT)/XMPPFramework/module $(SDKROOT)/usr/include/libresolv', 'OTHER_LDFLAGS' => '"$(inherited)" "-lxml2"',
-'LIBRARY_SEARCH_PATHS' => '"$(PODS_ROOT)/XMPPFramework/Vendor/libidn" "/usr/include/libxml2" "${SDK_DIR}"/usr/include/libxml2', 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES'}
+'LIBRARY_SEARCH_PATHS' => '"/usr/include/libxml2" "${SDK_DIR}"/usr/include/libxml2'}
 end
 
 s.subspec 'BandwidthMonitor' do |ss|
