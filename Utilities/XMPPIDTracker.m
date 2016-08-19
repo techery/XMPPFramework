@@ -14,7 +14,7 @@ static const int xmppLogLevel = XMPP_LOG_LEVEL_VERBOSE; // | XMPP_LOG_FLAG_TRACE
 static const int xmppLogLevel = XMPP_LOG_LEVEL_WARN;
 #endif
 
-#define AssertProperQueue() NSAssert(dispatch_get_specific(queueTag), @"Invoked on incorrect queue")
+#define AssertProperQueue() 
 
 const NSTimeInterval XMPPIDTrackerTimeoutNone = -1;
 
